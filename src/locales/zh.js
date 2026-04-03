@@ -1,78 +1,114 @@
 export default {
-    name: 'zh',
-    nav: {
-        home: '主页',
-        about: '关于我',
-        myProj: '我的项目',
-        current: '制作中项目',
-        past: '已完成项目',
-        contact: '联系我'
-    },
-    footers: {
-        leftTitle1: '这个网页由姚远乐设计以及开发',
-        leftTitle2: '这个网页基于VUE3开发',
-        contactWay1: '微信',
-        contactWay2: '邮箱',
-        yes: '已经添加',
-        cencel: "滚犊子"
-    },
-    home: {
-        title1: '你好,',
-        title2: '我是姚远乐',
-        button1: '了解更多',
-        part2Title1: '现在正在进行的项目是',
-        part2Content: '个人主页',
-        stillWork: '全新区域正在制作，敬请期待...',
-    },
-    about: {
-        title1: '关于我',
-        getResume: '从这里获得我的简历',
-        part1Title: '你好，我是姚远乐，一个像杂食性动物一样适应性强的全栈开发者。',
-        part1Content: '我就如同一个知识的杂食者，我什么都想吃。我有兴趣发现和学习的任何新知识',
-        part2Title: '我希望成为一个全能的全栈工程师',
-        part2Content: `我目前就读于澳大利亚悉尼科技大学，在那里我正在继续我的学业。在此之前，我成功完成了莫纳什大学的信息技术学士学位。
-                    通过我在澳大利亚的学术之旅，我获得了坚实的知识基础和适用于各个领域的基本技能。此外，我还培养了快速掌握新信息的能力，
-                    以及在不熟悉的团队和工作环境中有效适应的能力。`,
-        part3Title: "关于我现在在干什么",
-        part3Content: `截至2024年7月，我任然在攻读我的研究生学位，在此之前我在国内进行我的实习，实习期间我尝试完成这个网站，并且学习使用VUE.js以及各种插件，
-                        我认为这是一个很好的练习以及经验，我也希望搭建这个网页的经历可以在以后帮助到我，同时我会持续更新这个网页和我的github。`,
-        part2018: `2018年，我第一次来到了澳大利亚墨尔本，我在Trinity college开始我的留学生活，在陌生的环境里我逐渐学会了独自生活，认识到了新的朋友，
-            学习到了新的知识以及逐渐适应一种全新的学习模式。从中式教育转变到澳大利亚式的教育对我来说是变化巨大的，我不得不开始适应必须自主学习的模式而不是有人推进你学习。
-            并且同时我还需要学会自己安排时间以及生活中的处处细节。这对于我来说是一个重大的转折`,
-        part2019: `2019年，我进入了蒙纳士大学开始了我的本科生活，相比较于Trinity College的生活，本科的课程更加的精简，在学校的时间十分的有限，
-        同时相比较于之前我很难找到老师去解决一些问题，更多的空闲时间意味着更难的时间管理以及自我监管。这一年我开始大面积的接触到关于软件开发的知识，
-        同时这些知识让我体会到了高强度的澳大利亚风格的教学，教授永远只负责讲课，剩下的任何知识如果不理解都需要在课后靠自己花大把大把时间去自学，
-        而不是有人会给你解答，并且作业从写小论文变成了编写程序。这些都给我带来了很多的挑战，但是好在尽管很难我都完美的通过了。`,
-        part2020To2021: `2020年到2021年，由于疫情关系我不得不在中国进行网课生活，相比较于第一年的校园生活，网课生活是枯燥的，同时许多的线上沟通变得十分的不便利，
-        同样这两年的网课生活也有好处，由于在家学习我可以把更多的精力放在学习上而不是分散一部分精力到生活上。`,
-        part2022: `2022年几乎宣告疫情结束，我和我的小伙伴们也终于逐渐回归校园，最后一年的校园生活显得弥足珍贵，在毕业项目的压力的同时我们也分出更多的时间去发掘两年疫情中缺失的留学生活，
-        这一年的年底，我完成了我的本科学业，成为了信息技术学士`,
-        part2023: `2023年我选择在悉尼科技大学继续学习软件开发的硕士学位，这一年我从墨尔本搬家到了悉尼，不一样的环境给我带来了挑战同时也让我体会到了不一样的城市带来的不一样的氛围。`,
-
-    },
-    current: {
-        title1: '现在正在进行项目：',
-        projectName: ' 个人主页',
-    },
-    past: {
-        title: '项目经历',
-        projectName1: '电箱计划',
-        projectDescrip1: '本项目致力于为智能家居打造一个更可控的系统，这将在电力控制上有着显著帮助，同时这个项目未来将会接入AI帮助用户更好更直观的看到他们可以通过这个app的帮助下获得的来自自发电的收益与支出。',
-        projectLink1: '暂时未被上传',
-        projectName2: '个人主页',
-        projectDescrip2: '这是我的个人主页，基于VUE架构，我相信这个网站可以帮助你更好的了解我。',
-        projectLink2: '暂时未上线，上线了记得改呆逼姚远乐',
-        projectName3: 'YOLOv5的图像检测',
-        projectDescrip3: '这个项目旨在使用yolov5模型进行实时的图像或视屏流检测，目前这个项目以及可以使用完整的模型对上传图像进行检测，未来将会实现对特定权重参数进行调整以及对视频流的检测。',
-        projectLink3: '未完成',
-        projectName4: '',
-        projectDescrip4: '',
-        projectLink4: '',
-
-    },
-    contact: {
-        title: '如何联系我',
-        label: '如果您对我感兴趣请通过以下方式联系我： ',
-        phone: '移动电话: +86 13600521418',
-    }
+  name: 'zh',
+  nav: {
+    brand: '姚远乐',
+    home: '首页',
+    about: '关于我',
+    current: '当前项目',
+    past: '过往项目',
+    contact: '联系我',
+    menu: '菜单',
+    close: '关闭',
+    languageToggle: 'EN / 中文'
+  },
+  common: {
+    qrTitle: '扫码添加我的微信',
+    confirm: '完成',
+    cancel: '取消'
+  },
+  footers: {
+    copyright: '@姚远乐 2026',
+    leftTitle1: '本网站由姚远乐设计并开发。',
+    leftTitle2: '基于 Vue 3 + Vite 构建。',
+    contactWay1: '微信',
+    contactWay2: '邮箱'
+  },
+  home: {
+    status: '可接受实习 / 全职机会',
+    title1: '你好，我是姚远乐。',
+    title2: '专注于实用落地的全栈工程师。',
+    ctaAbout: '了解我',
+    ctaCurrent: '当前项目',
+    bentoFocusLabel: '专注方向',
+    bentoFocusTitle: '全栈开发',
+    bentoFocusDesc: '擅长 Vue、API 集成、后端基础能力与持续迭代交付。',
+    bentoNowLabel: '正在构建',
+    part2Content: '个人主页',
+    bentoNowDesc: '一个支持中英文、响应式布局、信息表达更清晰的个人网站。',
+    bentoBasedLabel: '所在城市',
+    bentoBasedTitle: '杭州 / 悉尼',
+    bentoBasedDesc: '在中国与澳洲学习和实践中积累了跨文化协作经验。',
+    bringTitle: '我能带来什么',
+    bring1: '快速进入新领域并搭建可运行原型。',
+    bring2: '具备前后端协作思维，能覆盖完整交付链路。',
+    bring3: '持续迭代产品体验，而不是一次性交付。',
+    ctaTitle: '一起做点有价值的事情。',
+    ctaDesc: '欢迎项目合作、技术交流和实习机会沟通。',
+    ctaContact: '联系我'
+  },
+  about: {
+    badge: '关于',
+    title1: '关于我',
+    getResume: '查看简历',
+    part1Title: '你好，我是姚远乐，一名适应力强、持续学习的全栈开发者。',
+    part1Content: '我对新知识始终保持好奇，喜欢在不同技术方向中探索和成长。',
+    educationTitle: '教育与经历',
+    part2Content:
+      '我目前在悉尼科技大学（UTS）继续深造，此前在莫纳什大学完成信息技术本科。留学与项目经历帮助我建立了扎实的技术基础，也让我更擅长在新团队和新环境中快速适应。',
+    techTitle: '技术栈',
+    skillFrontend: '前端',
+    skillFrontendValue: 'HTML, CSS, Vue 3, Element Plus',
+    skillBackend: '后端',
+    skillBackendValue: 'SQL, Java, Python, C++, PHP, Swift',
+    skillGeneral: '通用能力',
+    skillGeneralValue: 'Git, 云计算, 敏捷开发',
+    skillLearning: '正在学习',
+    skillLearningValue: 'Unity, UE5, Maya',
+    timelineTitle: '时间线',
+    part3Content: '截至 2024 年，我在学习与实践中持续完善这个网站和个人作品。',
+    part2018: '2018 年，我来到墨尔本并在 Trinity College 开启留学生活，逐步适应新的环境和学习方式。',
+    part2019: '2019 年，我进入莫纳什大学，开始系统接触软件开发，并强化自主学习能力。',
+    part2020To2021: '2020 到 2021 年，疫情期间以线上学习为主，节奏更难但也让我更聚焦学业成长。',
+    part2022: '2022 年回归校园，在本科最后一年平衡毕业任务与团队协作。',
+    part2023: '2023 年，我从墨尔本搬到悉尼，在 UTS 开始软件开发方向的硕士学习。'
+  },
+  current: {
+    badge: '进行中',
+    title1: '当前项目：',
+    projectName: '个人主页',
+    intro: '这个项目正在迭代为更现代、更清晰、更有表达力的个人网站。',
+    goalsTitle: '当前目标',
+    goal1: '提升首屏表现力，让招聘方与合作方快速建立印象。',
+    goal2: '统一全站视觉与内容结构，并优化移动端体验。',
+    goal3: '保持代码模块化，便于快速更新内容。',
+    nextTitle: '下一步优化',
+    next1: '增加更多案例细节（截图、架构思路、难点总结）。',
+    next2: '通过路由级拆分优化打包体积。',
+    next3: '接入 GitHub Actions 持续部署流程。'
+  },
+  past: {
+    badge: '项目归档',
+    title: '过往项目',
+    subtitle: '这里展示了我在软件与 AI 方向的部分实践项目。',
+    projectName1: '智能用电管理',
+    projectDescrip1: '面向智能家居用电管理的概念项目，强调可控性与收益/成本可视化。',
+    projectLink1: '链接：暂未发布',
+    projectName2: '个人主页',
+    projectDescrip2: '基于 Vue 构建的个人网站，用于展示我的经历与项目。',
+    projectLink2: '链接：暂未发布',
+    projectName3: '基于 YOLOv5 的图像检测',
+    projectDescrip3: '使用 YOLOv5 进行图像/视频流检测，并计划支持自定义权重调参。',
+    projectLink3: '链接：开发中'
+  },
+  contact: {
+    badge: '联系',
+    title: '联系我',
+    label: '如果你对合作感兴趣，欢迎随时联系我。',
+    directTitle: '直接联系',
+    socialTitle: '社交方式',
+    phone: '手机：+86 13600521418'
+  },
+  notFound: {
+    title: '404 页面不存在'
+  }
 }

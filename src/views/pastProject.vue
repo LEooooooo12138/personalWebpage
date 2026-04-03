@@ -1,77 +1,54 @@
-<template>
-    <div class="demo-collapse">
-      <el-collapse accordion>
-        <el-collapse-item name="1">
-          <template #title="{ isActive }">
-            <div :class="['title-wrapper', { 'is-active': isActive }]">
-              {{ $t ('past.projectName1') }}
-              <el-icon class="header-icon">
-                <info-filled />
-              </el-icon>
-            </div>
-          </template>
-          <div>
-            {{ $t ('past.projectDescrip1')}}
-          </div>
-          <div>
-            {{ $t ('past.projectLink1')}}
-          </div>
-        </el-collapse-item>
-        <el-collapse-item name="2">
-          <template #title="{ isActive }">
-            <div :class="['title-wrapper', { 'is-active': isActive }]">
-              {{ $t ('past.projectName2') }}
-              <el-icon class="header-icon">
-                <info-filled />
-              </el-icon>
-            </div>
-          </template>
-          <div>
-            {{ $t ('past.projectDescrip2')}}
-          </div>
-          <div>
-            {{ $t ('past.projectLink2')}}
-          </div>
-        </el-collapse-item>
-        <el-collapse-item name="3">
-            <template #title="{ isActive }">
-            <div :class="['title-wrapper', { 'is-active': isActive }]">
-                {{ $t ('past.projectName3') }}
-                <el-icon class="header-icon">
-                <info-filled />
-                </el-icon>
-            </div>
-            </template>
-          <div>
-            {{ $t ('past.projectDescrip3')}}
-          </div>
-          <div>
-            {{ $t ('past.projectLink3')}}
-          </div>
-        </el-collapse-item>
-      </el-collapse>
-    </div>
-  </template>
-  
-  <script setup lang="ts">
-  import { InfoFilled } from '@element-plus/icons-vue'
-  </script>
-  
-  <style scoped>
-  .title-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  
-  .title-wrapper.is-active {
-    color: var(--el-color-primary);
-  }
+﻿<template>
+  <div class="page-container">
+    <section class="section-card">
+      <span class="pill mono">{{ $t('past.badge') }}</span>
+      <h1 class="section-title">{{ $t('past.title') }}</h1>
+      <p class="section-subtitle">{{ $t('past.subtitle') }}</p>
+    </section>
 
-  .el-collapse-item{
-    margin-left: 20px;
-    margin-right: 20px;
+    <section class="grid-three">
+      <article v-for="project in projects" :key="project.name" class="section-card project-card">
+        <h3>{{ project.name }}</h3>
+        <p class="section-subtitle">{{ project.description }}</p>
+        <p class="mono project-link">{{ project.link }}</p>
+      </article>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+const projects = computed(() => [
+  {
+    name: t('past.projectName1'),
+    description: t('past.projectDescrip1'),
+    link: t('past.projectLink1')
+  },
+  {
+    name: t('past.projectName2'),
+    description: t('past.projectDescrip2'),
+    link: t('past.projectLink2')
+  },
+  {
+    name: t('past.projectName3'),
+    description: t('past.projectDescrip3'),
+    link: t('past.projectLink3')
   }
-  
-  </style>
-  
+])
+</script>
+
+<style scoped>
+.project-card h3 {
+  margin-top: 0;
+}
+
+.project-link {
+  margin-bottom: 0;
+  color: #0f766e;
+  font-size: 0.85rem;
+}
+</style>

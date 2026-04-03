@@ -1,146 +1,150 @@
-<template>
-  <div v-if="!isMobile">
-    <el-config-provider :locale="locale"> </el-config-provider>
-    <el-menu
-      :router="true"
-      class="el-menu-poper-demo"
-      mode="horizontal"
-      :ellipsis="false"
-      :popper-offset="6"
-    >
-      <el-menu-item index="/">
-        <el-icon><house /></el-icon>
-        <p>{{ $t("nav.home") }}</p>
-      </el-menu-item>
-      <div class="flex-grow">
-        <el-menu-item index="/about">
-          <font-awesome-icon icon="user" style="padding-right: 8px" />
-          {{ $t("nav.about") }}
-        </el-menu-item>
-        <el-sub-menu index="/project" >
-          <template #title
-            ><Edit
-              style="
-                width: 1em;
-                height: 1em;
-                margin-right: 8px;
-                font-size: 20px;
-              "
-            />{{ $t("nav.myProj") }}</template
-          >
-          <el-menu-item index="/current">{{ $t("nav.current") }}</el-menu-item>
-          <el-menu-item index="/past">{{ $t("nav.past") }}</el-menu-item>
-        </el-sub-menu>
-        <el-menu-item index="/contact">
-          <font-awesome-icon icon="phone" style="padding-right: 8px" />
-          {{ $t("nav.contact") }}
-        </el-menu-item>
-        <el-menu-item @click="toggle">
-          <el-button type="success" circle>
-            <font-awesome-icon icon="language" size="xl" />
-          </el-button>
-        </el-menu-item>
-      </div>
-    </el-menu>
-  </div>
+﻿<template>
+  <header class="nav-shell">
+    <div class="nav-inner">
+      <RouterLink to="/" class="brand">
+        <span class="brand-dot"></span>
+        <span class="brand-text mono">{{ $t('nav.brand') }}</span>
+      </RouterLink>
 
-  <div v-else>
-    <el-menu
-      :router="true"
-      class="el-menu-poper-demo"
-      mode="horizontal"
-      :popper-offset="6"
-    >
-      <el-menu-item index="/">
-        <el-icon><house /></el-icon>
-        <p>{{ $t("nav.home") }}</p>
-      </el-menu-item>
-      <div class="flex-grow">
-        <el-menu-item index="/about">
-          <font-awesome-icon icon="user" style="padding-right: 8px" />
-          {{ $t("nav.about") }}
-        </el-menu-item>
-        <el-sub-menu index="/project" :disabled="true">
-          <template #title
-            ><Edit
-              style="
-                width: 1em;
-                height: 1em;
-                margin-right: 8px;
-                font-size: 20px;
-              "
-            />{{ $t("nav.myProj") }}</template
-          >
-          <el-menu-item index="/current">{{ $t("nav.current") }}</el-menu-item>
-          <el-menu-item index="/past">{{ $t("nav.past") }}</el-menu-item>
-        </el-sub-menu>
-        <el-menu-item index="/contact">
-          <font-awesome-icon icon="phone" style="padding-right: 8px" />
-          {{ $t("nav.contact") }}
-        </el-menu-item>
-        <el-menu-item @click="toggle">
-          <el-button type="success" circle>
-            <font-awesome-icon icon="language" size="xl" />
-          </el-button>
-        </el-menu-item>
-      </div>
-    </el-menu>
+      <button class="menu-btn" @click="menuOpen = !menuOpen">
+        {{ menuOpen ? $t('nav.close') : $t('nav.menu') }}
+      </button>
 
-  </div>
+      <nav :class="['nav-links', { open: menuOpen }]">
+        <RouterLink to="/about" class="nav-link" @click="closeMenu">{{ $t('nav.about') }}</RouterLink>
+        <RouterLink to="/current" class="nav-link" @click="closeMenu">{{ $t('nav.current') }}</RouterLink>
+        <RouterLink to="/past" class="nav-link" @click="closeMenu">{{ $t('nav.past') }}</RouterLink>
+        <RouterLink to="/contact" class="nav-link" @click="closeMenu">{{ $t('nav.contact') }}</RouterLink>
+        <button class="lang-btn" @click="toggleLanguage">{{ $t('nav.languageToggle') }}</button>
+      </nav>
+    </div>
+  </header>
 </template>
 
-<script lang="ts" setup>
-import { width } from "@fortawesome/free-brands-svg-icons/fa42Group";
-import { fa } from "element-plus/es/locales.mjs";
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { useI18n } from "vue-i18n";
-const { locale } = useI18n();
+<script setup>
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
-const activeIndex = ref("/");
-const handleSelect = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath);
-};
+const { locale } = useI18n()
+const menuOpen = ref(false)
 
-const toggle = () => {
-  const language = localStorage.getItem("language");
-  if (language) {
-    const str = language === "zh" ? "en" : "zh";
-    localStorage.setItem("language", str);
-  } else {
-    localStorage.setItem("language", "zh");
-  }
-  locale.value = localStorage.getItem("language") || "zh";
-};
-
-
-//=================
-const isMobile = ref(false)
-onMounted(()=>{
-    checkMobile();
-    // 监听窗口大小变化
-    window.addEventListener('resize', checkMobile);
-})
-onBeforeUnmount(()=>{
-  window.removeEventListener('resize', checkMobile);
-})
-const checkMobile = ()=>{
-  const val = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  
-  isMobile.value = val;
+const closeMenu = () => {
+  menuOpen.value = false
 }
 
-
+const toggleLanguage = () => {
+  const current = localStorage.getItem('language') || 'zh'
+  const next = current === 'zh' ? 'en' : 'zh'
+  localStorage.setItem('language', next)
+  locale.value = next
+}
 </script>
 
-
-<style>
-.flex-grow {
-  display: flex;
-  justify-content: right;
-  flex-grow: 1;
+<style scoped>
+.nav-shell {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding: 0.8rem 0;
 }
 
-.el-menu-demo {
-  padding-right: 1rem;
+.nav-inner {
+  width: min(1120px, calc(100vw - 2rem));
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.66);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 30px rgba(18, 32, 56, 0.11);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.brand-dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background: linear-gradient(130deg, #0f766e, #f59e0b);
+}
+
+.brand-text {
+  font-size: 0.95rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.nav-link {
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  color: #334155;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover,
+.router-link-active.nav-link {
+  color: #0f766e;
+  background: rgba(15, 118, 110, 0.12);
+}
+
+.lang-btn {
+  border: 1px solid rgba(15, 118, 110, 0.4);
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  cursor: pointer;
+}
+
+.menu-btn {
+  display: none;
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  border-radius: 999px;
+  background: white;
+  padding: 0.2rem 0.75rem;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 900px) {
+  .nav-inner {
+    width: min(1120px, calc(100vw - 1rem));
+    flex-wrap: wrap;
+  }
+
+  .menu-btn {
+    display: inline-block;
+  }
+
+  .nav-links {
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-link {
+    text-align: center;
+  }
 }
 </style>

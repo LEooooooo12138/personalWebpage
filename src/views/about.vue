@@ -1,123 +1,80 @@
-<template>
-    <el-space direction="vertical" size="large" class="mainBody">
-        <div>
-            <h1>{{ $t ('about.title1') }}</h1>
-        </div>
-        <el-button @click="download">{{ $t ('about.getResume') }}</el-button>
-        <div>
-            <h2>{{ $t ('about.part1Title') }}</h2>
-            <p> {{ $t ('about.part1Content') }}</p>
-        </div>
-        
-        <div>
-            <h2>{{ $t ('about.part2Title') }}</h2>   
-            <p>{{ $t ('about.part2Content') }}</p>
-        </div>
+﻿<template>
+  <div class="page-container">
+    <section class="section-card">
+      <span class="pill mono">{{ $t('about.badge') }}</span>
+      <h1 class="section-title">{{ $t('about.title1') }}</h1>
+      <p class="section-subtitle">{{ $t('about.part1Title') }}</p>
+      <p>{{ $t('about.part1Content') }}</p>
+      <el-button type="primary" round @click="download">{{ $t('about.getResume') }}</el-button>
+    </section>
 
-        <div>
-            <h3><el-icon class="icons"><Monitor /></el-icon>Front-End</h3>
-            <div>
-                <font-awesome-icon icon="file-code" style="padding-right: 4px;"/>HTML  CSS   VUE
-            </div>
-            <h3><el-icon class="icons"><Platform /></el-icon>Back-End</h3>
-            <div>
-                <font-awesome-icon icon="database" style="padding-right: 4px;"/>SQL
-                <font-awesome-icon icon="keyboard" style="padding-right: 4px;"/>C++, JAVA, Python, Swift, PHP
-            </div>
-            <h3><el-icon class="icons"><OfficeBuilding /></el-icon>General</h3>
-            <div>Git, Cloud Computing, Enterprise-level Development, Agile Project Management</div>
-            <h3><el-icon class="icons"><Hide /></el-icon>Not skilled but some basic</h3>
-            <div>UE5, Unity, Maya</div>
-        </div>
-        <div>
-            <el-slider v-model="value" :min="2018" :max="2024" :step="1" style="width: 300px" >
-            </el-slider>
-        </div>
-        <div class="yearDoing">
-            <div v-if="value===2018">
-                <h2>{{ $t ('about.part3Title') }}</h2>   
-                <p>{{ $t ('about.part2018') }}</p>
-            </div> 
-            <div v-if="value===2019">
-                <h2>{{ $t ('about.part3Title') }}</h2>   
-                <p>{{ $t ('about.part2019') }}</p>
-            </div> 
-            <div v-if="value===2020|| value===2021">
-                <h2>{{ $t ('about.part3Title') }}</h2>   
-                <p>{{ $t ('about.part2020To2021') }}</p>
-            </div> 
-            <div v-if="value===2022">
-                <h2>{{ $t ('about.part3Title') }}</h2>   
-                <p>{{ $t ('about.part2022') }}</p>
-            </div> 
-            <div v-if="value===2023">
-                <h2>{{ $t ('about.part3Title') }}</h2>   
-                <p>{{ $t ('about.part2023') }}</p>
-            </div> 
-            <div v-if="value===2024">
-                <h2>{{ $t ('about.part3Title') }}</h2>   
-                <p>{{ $t ('about.part3Content') }}</p>
-            </div> 
-        </div>
+    <section class="grid-two">
+      <article class="section-card">
+        <h2 class="section-title">{{ $t('about.educationTitle') }}</h2>
+        <p>{{ $t('about.part2Content') }}</p>
+      </article>
+      <article class="section-card">
+        <h2 class="section-title">{{ $t('about.techTitle') }}</h2>
+        <ul class="skill-list">
+          <li><strong>{{ $t('about.skillFrontend') }}:</strong> {{ $t('about.skillFrontendValue') }}</li>
+          <li><strong>{{ $t('about.skillBackend') }}:</strong> {{ $t('about.skillBackendValue') }}</li>
+          <li><strong>{{ $t('about.skillGeneral') }}:</strong> {{ $t('about.skillGeneralValue') }}</li>
+          <li><strong>{{ $t('about.skillLearning') }}:</strong> {{ $t('about.skillLearningValue') }}</li>
+        </ul>
+      </article>
+    </section>
 
-    </el-space>
-    
+    <section class="section-card">
+      <div class="timeline-head">
+        <h2 class="section-title">{{ $t('about.timelineTitle') }}</h2>
+        <span class="pill mono">{{ value }}</span>
+      </div>
+      <el-slider v-model="value" :min="2018" :max="2024" :step="1" />
+      <p class="timeline-text">{{ currentTimelineText }}</p>
+    </section>
+  </div>
 </template>
 
 <script setup>
-import NaviBar from '../components/NaviBar.vue';
-import footerOne from '../components/Footer.vue';
-import resumeFile from '../assets/resume/CV.pdf';
-import { faDatabase, faFileCode, faKeyboard } from '@fortawesome/free-solid-svg-icons';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { ref } from 'vue';
-library.add( faDatabase, faKeyboard,faFileCode)
+import { computed, ref } from 'vue'
+import resumeFile from '../assets/resume/CV.pdf'
+import { useI18n } from 'vue-i18n'
 
-const value = ref('2018')
+const { t } = useI18n()
+const value = ref(2024)
 
-const download = ()=> {
-    window.open(resumeFile)
+const download = () => {
+  window.open(resumeFile)
 }
 
+const currentTimelineText = computed(() => {
+  if (value.value === 2018) return t('about.part2018')
+  if (value.value === 2019) return t('about.part2019')
+  if (value.value === 2020 || value.value === 2021) return t('about.part2020To2021')
+  if (value.value === 2022) return t('about.part2022')
+  if (value.value === 2023) return t('about.part2023')
+  return t('about.part3Content')
+})
 </script>
 
-
 <style scoped>
-.mainBody {
-    display: flex;
-    left: 0%;
-    margin-left: 10%;
-    margin-right: 10%;
-    animation: 1s ease-in fade-inL;
-
+.skill-list {
+  margin: 0.4rem 0 0;
+  padding-left: 1rem;
 }
 
-
-.timeline {
-    height: 50px;
-    display: flex;
-    justify-content: center;
+.skill-list li {
+  margin-bottom: 0.45rem;
 }
 
-.icons {
-    padding: 6px;
+.timeline-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
 }
 
-.yearDoing{
-    animation: 1s ease-in fade-inL;
-}
-
-@keyframes fade-inL{
-  0% {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  70% {
-    opacity: 0.5;
-  }
-  100%{
-    opacity: 1;
-    transform: translateY(0);
-  }
+.timeline-text {
+  margin-top: 0.85rem;
 }
 </style>

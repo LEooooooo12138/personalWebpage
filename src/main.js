@@ -6,7 +6,6 @@ import 'element-plus/dist/index.css'
 import { createWebHistory, createRouter } from 'vue-router'
 
 import App from './App.vue'
-import component from 'element-plus/es/components/tree-select/src/tree-select-option.mjs'
 import index from './views/index.vue'
 import About from './views/about.vue'
 import PastProject from './views/pastProject.vue'
