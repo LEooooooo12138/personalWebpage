@@ -19,6 +19,7 @@ const initialStatus: LiveStatus = {
 export function HomePage() {
   const { m, lang } = useLanguage();
   const [status, setStatus] = useState<LiveStatus>(initialStatus);
+  const [visitCount, setVisitCount] = useState<number | null>(null);
 
   const fetchStatus = useCallback(async () => {
     const response = await fetch(`/api/status?lang=${lang}`);
@@ -36,6 +37,51 @@ export function HomePage() {
       clearInterval(timer);
     };
   }, [fetchStatus]);
+
+  useEffect(() => {
+    const page = "home";
+    const sessionKey = "site_visit_session_id";
+    const pageVisitedKey = `site_page_visited_${page}`;
+
+    const ensureSessionId = () => {
+      const existing = sessionStorage.getItem(sessionKey);
+      if (existing) return existing;
+      const id = crypto.randomUUID();
+      sessionStorage.setItem(sessionKey, id);
+      return id;
+    };
+
+    const syncVisitCounter = async () => {
+      const sessionId = ensureSessionId();
+      const visited = sessionStorage.getItem(pageVisitedKey) === "1";
+
+      if (!visited) {
+        const response = await fetch("/api/visits", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ page, sessionId }),
+        });
+
+        if (response.ok) {
+          const data = (await response.json()) as { count?: number };
+          if (typeof data.count === "number") {
+            setVisitCount(data.count);
+          }
+          sessionStorage.setItem(pageVisitedKey, "1");
+          return;
+        }
+      }
+
+      const countResponse = await fetch(`/api/visits?page=${page}`);
+      if (!countResponse.ok) return;
+      const countData = (await countResponse.json()) as { count?: number };
+      if (typeof countData.count === "number") {
+        setVisitCount(countData.count);
+      }
+    };
+
+    void syncVisitCounter();
+  }, []);
 
   return (
     <section className="layout-grid">
@@ -94,6 +140,11 @@ export function HomePage() {
           ))}
         </div>
       </motion.article>
+
+      <div className="visit-counter">
+        <span>{lang === "zh" ? "总访问量" : "Total Visits"}</span>
+        <strong>{visitCount ?? "--"}</strong>
+      </div>
     </section>
   );
 }
