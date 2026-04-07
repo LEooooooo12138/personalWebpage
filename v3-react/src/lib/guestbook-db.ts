@@ -1,3 +1,4 @@
+import { list, put } from "@vercel/blob";
 import Database from "better-sqlite3";
 import fs from "node:fs";
 import path from "node:path";
@@ -14,35 +15,8 @@ declare global {
   var __guestbookDb: Database.Database | undefined;
 }
 
-const getFallbackJsonPath = () => {
-  const baseDir = process.env.VERCEL ? "/tmp" : path.join(process.cwd(), "data");
-  if (!fs.existsSync(baseDir)) {
-    fs.mkdirSync(baseDir, { recursive: true });
-  }
-  return path.join(baseDir, "guestbook.json");
-};
-
-const readFallbackNotes = (): GuestNote[] => {
-  const jsonPath = getFallbackJsonPath();
-  if (!fs.existsSync(jsonPath)) {
-    return [];
-  }
-
-  try {
-    const raw = fs.readFileSync(jsonPath, "utf-8");
-    const parsed = JSON.parse(raw) as GuestNote[];
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-    return parsed;
-  } catch {
-    return [];
-  }
-};
-
-const writeFallbackNotes = (notes: GuestNote[]) => {
-  fs.writeFileSync(getFallbackJsonPath(), JSON.stringify(notes, null, 2), "utf-8");
-};
+const BLOB_PREFIX = "guestbook/notes/";
+const hasBlobToken = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 
 const getDbPath = () => {
   const dataDir = path.join(process.cwd(), "data");
@@ -71,38 +45,84 @@ const getDb = () => {
   return globalThis.__guestbookDb;
 };
 
-export const listGuestbookNotes = (): GuestNote[] => {
-  try {
-    const db = getDb();
-    const rows = db
-      .prepare(
-        "SELECT id, author, message, created_at FROM guestbook_notes ORDER BY created_at DESC LIMIT 500",
-      )
-      .all() as GuestbookRow[];
+const listFromBlob = async (): Promise<GuestNote[]> => {
+  const notes: GuestNote[] = [];
+  let cursor: string | undefined;
 
-    return rows.map((row) => ({
-      id: row.id,
-      author: row.author,
-      message: row.message,
-      createdAt: row.created_at,
-    }));
-  } catch {
-    return readFallbackNotes()
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-      .slice(0, 500);
-  }
+  do {
+    const result = await list({
+      prefix: BLOB_PREFIX,
+      cursor,
+      limit: 1000,
+    });
+
+    for (const blob of result.blobs) {
+      const response = await fetch(blob.url, { cache: "no-store" });
+      if (!response.ok) continue;
+      const parsed = (await response.json()) as GuestNote;
+      if (
+        parsed &&
+        typeof parsed.id === "string" &&
+        typeof parsed.author === "string" &&
+        typeof parsed.message === "string" &&
+        typeof parsed.createdAt === "string"
+      ) {
+        notes.push(parsed);
+      }
+    }
+
+    cursor = result.hasMore ? result.cursor : undefined;
+  } while (cursor);
+
+  return notes.sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 500);
 };
 
-export const insertGuestbookNote = (note: GuestNote): GuestNote => {
-  try {
-    const db = getDb();
-    db.prepare(
-      "INSERT INTO guestbook_notes (id, author, message, created_at) VALUES (?, ?, ?, ?)",
-    ).run(note.id, note.author, note.message, note.createdAt);
-  } catch {
-    const notes = readFallbackNotes();
-    notes.push(note);
-    writeFallbackNotes(notes);
+const insertToBlob = async (note: GuestNote) => {
+  await put(`${BLOB_PREFIX}${note.id}.json`, JSON.stringify(note), {
+    access: "public",
+    addRandomSuffix: false,
+    contentType: "application/json",
+    allowOverwrite: false,
+  });
+};
+
+const listFromSqlite = (): GuestNote[] => {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      "SELECT id, author, message, created_at FROM guestbook_notes ORDER BY created_at DESC LIMIT 500",
+    )
+    .all() as GuestbookRow[];
+
+  return rows.map((row) => ({
+    id: row.id,
+    author: row.author,
+    message: row.message,
+    createdAt: row.created_at,
+  }));
+};
+
+const insertToSqlite = (note: GuestNote) => {
+  const db = getDb();
+  db.prepare(
+    "INSERT INTO guestbook_notes (id, author, message, created_at) VALUES (?, ?, ?, ?)",
+  ).run(note.id, note.author, note.message, note.createdAt);
+};
+
+export const listGuestbookNotes = async (): Promise<GuestNote[]> => {
+  if (hasBlobToken) {
+    return listFromBlob();
   }
+  return listFromSqlite();
+};
+
+export const insertGuestbookNote = async (note: GuestNote): Promise<GuestNote> => {
+  if (hasBlobToken) {
+    await insertToBlob(note);
+    return note;
+  }
+
+  insertToSqlite(note);
   return note;
 };
+

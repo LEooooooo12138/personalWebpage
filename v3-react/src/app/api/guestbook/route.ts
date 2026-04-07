@@ -8,7 +8,7 @@ type GuestbookPayload = {
 
 export async function GET() {
   try {
-    const notes = listGuestbookNotes();
+    const notes = await listGuestbookNotes();
     return NextResponse.json(notes);
   } catch {
     return NextResponse.json(
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     createdAt: new Date().toISOString(),
   };
   try {
-    insertGuestbookNote(note);
+    await insertGuestbookNote(note);
     return NextResponse.json(note, { status: 201 });
   } catch {
     return NextResponse.json(
