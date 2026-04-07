@@ -17,12 +17,30 @@ export function LabPage() {
   const [guestNotes, setGuestNotes] = useState<GuestNote[]>([]);
   const [author, setAuthor] = useState("");
   const [message, setMessage] = useState("");
+  const [guestbookError, setGuestbookError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchGuestbook = useCallback(async () => {
-    const response = await fetch("/api/guestbook");
-    if (!response.ok) return;
-    setGuestNotes((await response.json()) as GuestNote[]);
-  }, []);
+    try {
+      const response = await fetch("/api/guestbook");
+      if (!response.ok) {
+        setGuestbookError(
+          lang === "zh"
+            ? "留言加载失败，请稍后重试。"
+            : "Failed to load messages. Please try again.",
+        );
+        return;
+      }
+      setGuestbookError("");
+      setGuestNotes((await response.json()) as GuestNote[]);
+    } catch {
+      setGuestbookError(
+        lang === "zh"
+          ? "留言加载失败，请检查网络后重试。"
+          : "Failed to load messages. Please check your network.",
+      );
+    }
+  }, [lang]);
 
   useEffect(() => {
     const bootTimer = setTimeout(() => {
@@ -49,15 +67,36 @@ export function LabPage() {
   };
 
   const submitNote = async () => {
-    if (!message.trim()) return;
-    const response = await fetch("/api/guestbook", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ author, message }),
-    });
-    if (!response.ok) return;
-    setMessage("");
-    void fetchGuestbook();
+    if (!message.trim() || isSubmitting) return;
+    setIsSubmitting(true);
+    setGuestbookError("");
+    try {
+      const response = await fetch("/api/guestbook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ author, message }),
+      });
+      if (!response.ok) {
+        const body = (await response.json().catch(() => ({}))) as { error?: string };
+        setGuestbookError(
+          body.error ??
+            (lang === "zh"
+              ? "留言提交失败，请稍后重试。"
+              : "Failed to submit message. Please try again."),
+        );
+        return;
+      }
+      setMessage("");
+      void fetchGuestbook();
+    } catch {
+      setGuestbookError(
+        lang === "zh"
+          ? "留言提交失败，请检查网络后重试。"
+          : "Failed to submit message. Please check your network.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -106,8 +145,15 @@ export function LabPage() {
             onChange={(event) => setMessage(event.target.value)}
             placeholder={m.lab.message}
           />
-          <button onClick={submitNote}>{m.lab.send}</button>
+          <button onClick={submitNote} disabled={isSubmitting}>
+            {isSubmitting ? (lang === "zh" ? "发送中..." : "Sending...") : m.lab.send}
+          </button>
         </div>
+        {guestbookError && (
+          <p className="hint" style={{ color: "#dc2626" }}>
+            {guestbookError}
+          </p>
+        )}
         <div className="notes">
           {guestNotes.map((note) => (
             <div key={note.id} className="note">

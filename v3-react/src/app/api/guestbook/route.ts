@@ -1,4 +1,4 @@
-import { getRuntimeStore } from "@/lib/runtime-store";
+import { insertGuestbookNote, listGuestbookNotes } from "@/lib/guestbook-db";
 import { NextResponse } from "next/server";
 
 type GuestbookPayload = {
@@ -7,11 +7,15 @@ type GuestbookPayload = {
 };
 
 export async function GET() {
-  const store = getRuntimeStore();
-  const notes = [...store.guestNotes].sort((a, b) =>
-    b.createdAt.localeCompare(a.createdAt),
-  );
-  return NextResponse.json(notes);
+  try {
+    const notes = listGuestbookNotes();
+    return NextResponse.json(notes);
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to load guestbook notes." },
+      { status: 500 },
+    );
+  }
 }
 
 export async function POST(request: Request) {
@@ -26,14 +30,19 @@ export async function POST(request: Request) {
     );
   }
 
-  const store = getRuntimeStore();
   const note = {
     id: crypto.randomUUID(),
     author: author || "Anonymous",
     message,
     createdAt: new Date().toISOString(),
   };
-  store.guestNotes.push(note);
-
-  return NextResponse.json(note, { status: 201 });
+  try {
+    insertGuestbookNote(note);
+    return NextResponse.json(note, { status: 201 });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to save guestbook note." },
+      { status: 500 },
+    );
+  }
 }
