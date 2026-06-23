@@ -3,6 +3,22 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
+/* ── 集中管理 DOM 标识符 ── */
+const IDS = {
+  cursor: "cursor",
+  cursorDot: "cursor-dot",
+  heroBgWord: "hero-bg-word",
+  scrollIndicator: "scroll-indicator",
+} as const;
+
+const SELECTORS = {
+  siteNav: ".site-nav",
+  reveal: "[data-reveal]",
+} as const;
+
+const HOVER_SELECTOR =
+  "a, button, input, textarea, .skill-card, .proj-row, .exp-item, .guest-note, .explore-link, .lab-input";
+
 export function CursorScript() {
   const pathname = usePathname();
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -28,9 +44,7 @@ export function CursorScript() {
 
     // Give React time to render new page content
     const timer = setTimeout(() => {
-      const revealEls = document.querySelectorAll<HTMLElement>(
-        "[data-reveal]",
-      );
+      const revealEls = document.querySelectorAll<HTMLElement>(SELECTORS.reveal);
 
       revealEls.forEach((el) => {
         if (observed.has(el)) return;
@@ -51,8 +65,8 @@ export function CursorScript() {
 
   // ── Cursor, parallax, scroll effects (runs once on mount) ──
   useEffect(() => {
-    const cursor = document.getElementById("cursor");
-    const cursorDot = document.getElementById("cursor-dot");
+    const cursor = document.getElementById(IDS.cursor);
+    const cursorDot = document.getElementById(IDS.cursorDot);
     if (!cursor || !cursorDot) return;
 
     let mouseX = 0, mouseY = 0, dotX = 0, dotY = 0;
@@ -74,11 +88,10 @@ export function CursorScript() {
     animateDot();
 
     // Cursor hover states
-    const hoverSelector = "a, button, input, textarea, .skill-card, .proj-row, .exp-item, .guest-note, .explore-link, .lab-input";
     const onEnter = () => cursor.classList.add("hover");
     const onLeave = () => cursor.classList.remove("hover");
     const updateHoverTargets = () => {
-      document.querySelectorAll(hoverSelector).forEach((el) => {
+      document.querySelectorAll(HOVER_SELECTOR).forEach((el) => {
         el.addEventListener("mouseenter", onEnter);
         el.addEventListener("mouseleave", onLeave);
       });
@@ -86,7 +99,7 @@ export function CursorScript() {
     updateHoverTargets();
 
     // Parallax for hero background word
-    const heroBgWord = document.getElementById("hero-bg-word");
+    const heroBgWord = document.getElementById(IDS.heroBgWord);
     const onParallax = (e: MouseEvent) => {
       if (heroBgWord) {
         const px = (e.clientX / window.innerWidth - 0.5) * 20;
@@ -97,8 +110,8 @@ export function CursorScript() {
     document.addEventListener("mousemove", onParallax);
 
     // Nav scroll state + scroll indicator
-    const nav = document.querySelector(".site-nav");
-    const scrollIndicator = document.getElementById("scroll-indicator");
+    const nav = document.querySelector(SELECTORS.siteNav);
+    const scrollIndicator = document.getElementById(IDS.scrollIndicator);
     const onScroll = () => {
       if (nav) {
         nav.classList.toggle("scrolled", window.scrollY > 60);

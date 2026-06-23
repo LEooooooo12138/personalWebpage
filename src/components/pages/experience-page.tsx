@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Language, messages } from "@/lib/i18n";
-import { useLanguage } from "@/components/language-provider";
+import { Language } from "@/lib/i18n";
+import { useHydratedLanguage } from "@/lib/use-hydrated-language";
 import { narrativeEn, narrativeZh } from "@/lib/experience-narrative";
 
 const NS = { narrativeEn, narrativeZh };
@@ -26,8 +26,7 @@ function parseKeywords(note?: string): string[] {
 }
 
 export function ExperiencePage({ serverLang }: { serverLang: Language }) {
-  const { m: ctxM, lang: ctxLang } = useLanguage();
-  const [mounted, setMounted] = useState(false);
+  const { m, lang, mounted } = useHydratedLanguage(serverLang);
   const [progress, setProgress] = useState(0);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [ticks, setTicks] = useState<number[]>([]);
@@ -35,8 +34,6 @@ export function ExperiencePage({ serverLang }: { serverLang: Language }) {
   const itemsRef = useRef<HTMLDivElement>(null);
   const itemEls = useRef<(HTMLDivElement | null)[]>([]);
   const rafId = useRef(0);
-
-  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (!mounted) return;
@@ -71,8 +68,6 @@ export function ExperiencePage({ serverLang }: { serverLang: Language }) {
     setExpanded((prev) => (prev === i ? null : i));
   }, []);
 
-  const m = mounted ? ctxM : messages[serverLang];
-  const lang = mounted ? ctxLang : serverLang;
   const narratives = lang === "zh" ? NS.narrativeZh : NS.narrativeEn;
   const narMap = new Map(narratives.map((n) => [n.year, n]));
 

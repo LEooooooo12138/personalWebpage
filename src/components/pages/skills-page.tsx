@@ -1,47 +1,47 @@
 "use client";
 
-import { profile, baseProjects } from "@/lib/portfolio-data";
 import { useEffect, useState } from "react";
 import { Language, messages } from "@/lib/i18n";
 import { useLanguage } from "@/components/language-provider";
+import { SkillsResponse } from "@/types/portfolio";
 
-const skillCategoryMap = {
-  frontend: ["HTML", "CSS", "Vue", "React"],
-  backend: ["SQL", "C++", "Java", "Python", "Swift", "PHP"],
-  tools: ["Git", "Cloud Computing", "Agile Project Management"],
-  game: ["UE5", "Unity", "Maya"],
-} as const;
+// ── Color mapping: DB color key → CSS variable ──
+const COLOR_VARS: Record<string, string> = {
+  gold: "var(--gold)",
+  terracotta: "var(--terracotta)",
+  sage: "var(--sage)",
+};
 
-type SkillCategory = keyof typeof skillCategoryMap;
-
-function getCategoryLabel(cat: SkillCategory, categories: { title: string; content: string }[]) {
-  const index: Record<SkillCategory, number> = { frontend: 0, backend: 1, tools: 2, game: 3 };
-  return categories[index[cat]]?.title ?? cat;
+function getColorVar(colorKey: string): string {
+  return COLOR_VARS[colorKey] ?? "var(--gold)";
 }
 
-function categoryFromLabel(label: string, categories: { title: string; content: string }[]): SkillCategory | null {
-  const map: Record<string, SkillCategory> = {
-    "Front-End": "frontend", "前端": "frontend",
-    "Back-End": "backend", "后端": "backend",
-    General: "tools", "通用能力": "tools",
-    "Basic Familiarity": "game", "基础了解": "game",
-  };
-  return map[label] ?? null;
-}
-
-export function SkillsPage({ serverLang }: { serverLang: Language }) {
+export function SkillsPage({
+  serverLang,
+  skillsData,
+}: {
+  serverLang: Language;
+  skillsData: SkillsResponse;
+}) {
   const { m: ctxM, lang: ctxLang } = useLanguage();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const m = mounted ? ctxM : messages[serverLang];
   const lang = mounted ? ctxLang : serverLang;
 
-  const [terminalMode, setTerminalMode] = useState(false);
-  const [terminalHistory, setTerminalHistory] = useState<string[]>([m.skills.terminalHint]);
-  const [terminalInput, setTerminalInput] = useState("");
+  // ── Accordion state ──
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const localizedLanguages = lang === "zh" ? ["中文（母语）", "英文（专业工作能力）"] : profile.languages;
+/*
+  // ── Terminal mode ──
+  const [terminalMode, setTerminalMode] = useState(false);
+  const [terminalHistory, setTerminalHistory] = useState<string[]>([
+    m.skills.terminalHint,
+  ]);
+  const [terminalInput, setTerminalInput] = useState("");
 
   const pushOutput = (history: string[], lines: string[]) => {
     history.push(...lines);
@@ -56,39 +56,47 @@ export function SkillsPage({ serverLang }: { serverLang: Language }) {
     if (command === "help") {
       nextHistory.push(m.skills.terminalHelp);
     } else if (command === "whoami") {
-      nextHistory.push(`${profile.name} / ${profile.role}`);
+      nextHistory.push("Yuanle Yao / Full-Stack Developer");
     } else if (command === "clear") {
       setTerminalHistory([m.skills.terminalCleared]);
       setTerminalInput("");
       return;
     } else if (command === "ls skills") {
       const lines: string[] = ["─── Skills by Category ───"];
-      for (const [cat, skills] of Object.entries(skillCategoryMap)) {
-        const label = getCategoryLabel(cat as SkillCategory, m.skills.categories);
-        lines.push(`[${label}]`);
-        lines.push(skills.join("  "));
+      for (const cat of skillsData.categories) {
+        lines.push(`[${cat.title}]`);
+        lines.push(cat.skills.join("  "));
       }
       nextHistory = pushOutput(nextHistory, lines);
     } else if (command.startsWith("ls ")) {
       const arg = command.slice(3).trim();
-      const cat = skillCategoryMap[arg as SkillCategory]
-        ? (arg as SkillCategory)
-        : categoryFromLabel(arg, m.skills.categories);
+      const cat = skillsData.categories.find(
+        (c) => c.id === arg || c.title.toLowerCase() === arg.toLowerCase()
+      );
       if (cat) {
-        const label = getCategoryLabel(cat, m.skills.categories);
-        nextHistory = pushOutput(nextHistory, [`[${label}]`, skillCategoryMap[cat].join("  ")]);
+        nextHistory = pushOutput(nextHistory, [
+          `[${cat.title}]`,
+          cat.skills.join("  "),
+        ]);
       } else if (arg === "projects") {
         const lines = ["─── Projects ───"];
-        for (const p of baseProjects) lines.push(`${p.id}: ${p.title}`);
+        lines.push(
+          "smart-energy: Smart Energy Manager",
+          "personal-web-v3: Personal Web V3",
+          "yolov5-detection: YOLOv5 Detection Toolkit"
+        );
         nextHistory = pushOutput(nextHistory, lines);
       } else {
         nextHistory.push(m.skills.terminalUnknown);
       }
     } else if (command === "cat languages.txt") {
-      nextHistory.push(localizedLanguages.join("  |  "));
+      nextHistory.push(skillsData.languages.join("  |  "));
     } else if (command === "cat experience") {
       const lines = ["─── Experience Timeline ───"];
-      for (const item of m.experience.items) lines.push(`${item.year} | ${item.title}`);
+      const expItems = messages[lang].experience.items;
+      for (const item of expItems) {
+        lines.push(`${item.year} | ${item.title}`);
+      }
       nextHistory = pushOutput(nextHistory, lines);
     } else {
       nextHistory.push(m.skills.terminalUnknown);
@@ -96,86 +104,97 @@ export function SkillsPage({ serverLang }: { serverLang: Language }) {
     setTerminalHistory(nextHistory.slice(-25));
     setTerminalInput("");
   };
+  */
 
-  const categories = m.skills.categories;
+  const { categories, languages } = skillsData;
+  const langLabel = lang === "zh" ? "语言" : "Languages";
 
   return (
     <section className="skills-page" id="skills">
-      <div className="skills-bg" id="skills-bg-word">skills</div>
-
-      <div className="skills-grid-col reveal-stagger" data-reveal>
-        <div className="col">
-          <div className="skill-card">
-            <div className="num">01</div>
-            <h3><em>{categories[0]?.title ?? "Front-End"}</em></h3>
-            <p>Polished interfaces with thoughtful animation. Pixel‑perfect implementation that feels alive.</p>
-            <div className="skill-tags">{skillCategoryMap.frontend.map((s) => <span key={s} className="hl">{s}</span>)}</div>
-          </div>
-        </div>
-        <div className="col">
-          <div className="skill-card">
-            <div className="num">02</div>
-            <h3><em>{categories[1]?.title ?? "Back-End"}</em></h3>
-            <p>Robust APIs, database architecture, and server‑side systems. From SQL schema design to cloud deployment.</p>
-            <div className="skill-tags">{skillCategoryMap.backend.map((s) => <span key={s}>{s}</span>)}</div>
-          </div>
-        </div>
-        <div className="col">
-          <div className="skill-card">
-            <div className="num">03</div>
-            <h3><em>{categories[2]?.title ?? "General"}</em></h3>
-            <p>Git, cloud computing, and agile workflows — the foundational practices that make engineering teams ship.</p>
-            <div className="skill-tags">{skillCategoryMap.tools.map((s) => <span key={s}>{s}</span>)}</div>
-          </div>
-        </div>
-        <div className="col">
-          <div className="skill-card">
-            <div className="num">04</div>
-            <h3><em>{categories[3]?.title ?? "Game &amp; 3D"}</em></h3>
-            <p>Real‑time engines and digital creation — where technical skill meets visual storytelling.</p>
-            <div className="skill-tags">{skillCategoryMap.game.map((s) => <span key={s}>{s}</span>)}</div>
-          </div>
-        </div>
+      <div className="skills-bg" id="skills-bg-word">
+        skills
       </div>
 
-      {/* Languages row */}
-      <div className="skills-grid-col reveal" data-reveal style={{ marginTop: "2rem" }}>
-        <div className="col full">
-          <div className="skill-card">
-            <div className="num" style={{ fontSize: "2rem", color: "var(--text-muted)" }}>{lang === "zh" ? "语言" : "Languages"}</div>
-            <div className="skill-tags">
-              {localizedLanguages.map((l) => <span key={l} className="hl">{l}</span>)}
+      {/* ── Header ── */}
+      <div className="skills-header reveal" data-reveal>
+        <h2>
+          <em>{m.skills.title}</em>
+        </h2>
+        <p className="skills-subtitle">
+          {lang === "zh"
+            ? "点击类别展开详情"
+            : "Click a category to expand details"}
+        </p>
+      </div>
+
+      {/* ── Category Accordion ── */}
+      <div className="skills-accordion reveal-stagger" data-reveal>
+        {categories.map((cat) => {
+          const isOpen = expandedId === cat.id;
+          const accent = getColorVar(cat.color);
+
+          return (
+            <div
+              key={cat.id}
+              className={`skills-row ${isOpen ? "open" : ""}`}
+              style={{ "--accent": accent } as React.CSSProperties}
+            >
+              {/* Collapsed header (always visible) */}
+              <button
+                className="skills-row-header"
+                onClick={() =>
+                  setExpandedId(isOpen ? null : cat.id)
+                }
+                aria-expanded={isOpen}
+              >
+                <span className="skills-row-dot" />
+                <span className="skills-row-title">{cat.title}</span>
+                <span className="skills-row-tags">
+                  {cat.skills.map((s, i) => (
+                    <span key={s}>
+                      {i > 0 && <span className="skills-tag-sep">·</span>}
+                      <span className="skills-tag">{s}</span>
+                    </span>
+                  ))}
+                </span>
+                <span className="skills-row-chevron">
+                  {isOpen ? "▲" : "▶"}
+                </span>
+              </button>
+
+              {/* Expanded body */}
+              <div
+                className="skills-row-body"
+                style={{
+                  maxHeight: isOpen ? "600px" : "0px",
+                  opacity: isOpen ? 1 : 0,
+                }}
+              >
+                <div className="skills-row-inner">
+                  {cat.description && (
+                    <p className="skills-row-desc">{cat.description}</p>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          );
+        })}
       </div>
 
-      {/* Terminal toggle */}
-      <div className="reveal" data-reveal style={{ marginTop: "2rem" }}>
-        <button
-          onClick={() => setTerminalMode((v) => !v)}
-          style={{
-            border: "1px solid var(--border)", background: "none",
-            padding: "0.4rem 0.9rem", cursor: "pointer",
-            fontFamily: "var(--mono)", fontSize: "0.82rem",
-            color: "var(--text-soft)", transition: "color 0.3s, border-color 0.3s",
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--gold)"; e.currentTarget.style.borderColor = "var(--gold)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-soft)"; e.currentTarget.style.borderColor = "var(--border)"; }}
-        >
-          {terminalMode ? m.skills.uiMode : m.skills.terminalMode}
-        </button>
+      {/* ── Languages Row ── */}
+      <div className="skills-lang reveal" data-reveal>
+        <span className="skills-lang-label">{langLabel}</span>
+        <span className="skills-lang-list">
+          {languages.map((l, i) => (
+            <span key={l}>
+              {i > 0 && <span className="skills-tag-sep">·</span>}
+              <span className="skills-tag hl">{l}</span>
+            </span>
+          ))}
+        </span>
       </div>
 
-      {terminalMode && (
-        <div className="skills-terminal">
-          {terminalHistory.map((line, i) => <div key={`${line}-${i}`}>{line}</div>)}
-          <form onSubmit={(e) => { e.preventDefault(); runTerminalCommand(terminalInput); }}>
-            <span>&gt;</span>
-            <input value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} placeholder="ls skills" />
-          </form>
-        </div>
-      )}
+{/* Terminal mode temporarily disabled */}
     </section>
   );
 }

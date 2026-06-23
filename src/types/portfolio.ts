@@ -30,3 +30,16 @@ export type ExperienceNode = {
   description: string;
   note?: string;
 };
+
+export type SkillCategory = {
+  id: string;
+  color: string;
+  title: string;
+  description: string;
+  skills: string[];
+};
+
+export type SkillsResponse = {
+  categories: SkillCategory[];
+  languages: string[];
+};

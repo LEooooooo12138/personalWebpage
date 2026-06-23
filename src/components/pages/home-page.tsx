@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { LiveStatus } from "@/types/portfolio";
-import { Language, messages } from "@/lib/i18n";
-import { useLanguage } from "@/components/language-provider";
+import { Language } from "@/lib/i18n";
+import { useHydratedLanguage } from "@/lib/use-hydrated-language";
 
 const initialStatus: LiveStatus = {
   availability: "Loading...",
@@ -15,12 +15,7 @@ const initialStatus: LiveStatus = {
 };
 
 export function HomePage({ serverLang }: { serverLang: Language }) {
-  const { m: ctxM, lang: ctxLang } = useLanguage();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-
-  const m = mounted ? ctxM : messages[serverLang];
-  const lang = mounted ? ctxLang : serverLang;
+  const { m, lang, mounted } = useHydratedLanguage(serverLang);
 
   const [status, setStatus] = useState<LiveStatus>(initialStatus);
   const [visitCount, setVisitCount] = useState<number | null>(null);

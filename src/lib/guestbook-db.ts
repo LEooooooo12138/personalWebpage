@@ -1,8 +1,6 @@
 import { list, put } from "@vercel/blob";
-import Database from "better-sqlite3";
-import fs from "node:fs";
-import path from "node:path";
 import { GuestNote } from "@/types/portfolio";
+import { getSingletonDb, shouldUseBlob } from "@/lib/db-factory";
 
 type GuestbookRow = {
   id: string;
@@ -11,39 +9,20 @@ type GuestbookRow = {
   created_at: string;
 };
 
-declare global {
-  var __guestbookDb: Database.Database | undefined;
-}
-
 const BLOB_PREFIX = "guestbook/notes/";
-const hasBlobToken = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 
-const getDbPath = () => {
-  const dataDir = path.join(process.cwd(), "data");
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-  return path.join(dataDir, "guestbook.db");
-};
+const SCHEMA_SQL = `
+  CREATE TABLE IF NOT EXISTS guestbook_notes (
+    id TEXT PRIMARY KEY,
+    author TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_guestbook_created_at
+  ON guestbook_notes(created_at DESC);
+`;
 
-const getDb = () => {
-  if (!globalThis.__guestbookDb) {
-    const db = new Database(getDbPath());
-    db.pragma("journal_mode = WAL");
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS guestbook_notes (
-        id TEXT PRIMARY KEY,
-        author TEXT NOT NULL,
-        message TEXT NOT NULL,
-        created_at TEXT NOT NULL
-      );
-      CREATE INDEX IF NOT EXISTS idx_guestbook_created_at
-      ON guestbook_notes(created_at DESC);
-    `);
-    globalThis.__guestbookDb = db;
-  }
-  return globalThis.__guestbookDb;
-};
+/* ── Blob 后端 ── */
 
 const listFromBlob = async (): Promise<GuestNote[]> => {
   const notes: GuestNote[] = [];
@@ -86,8 +65,10 @@ const insertToBlob = async (note: GuestNote) => {
   });
 };
 
+/* ── SQLite 后端 ── */
+
 const listFromSqlite = (): GuestNote[] => {
-  const db = getDb();
+  const db = getSingletonDb("guestbook", SCHEMA_SQL);
   const rows = db
     .prepare(
       "SELECT id, author, message, created_at FROM guestbook_notes ORDER BY created_at DESC LIMIT 500",
@@ -103,21 +84,23 @@ const listFromSqlite = (): GuestNote[] => {
 };
 
 const insertToSqlite = (note: GuestNote) => {
-  const db = getDb();
+  const db = getSingletonDb("guestbook", SCHEMA_SQL);
   db.prepare(
     "INSERT INTO guestbook_notes (id, author, message, created_at) VALUES (?, ?, ?, ?)",
   ).run(note.id, note.author, note.message, note.createdAt);
 };
 
+/* ── 对外接口 ── */
+
 export const listGuestbookNotes = async (): Promise<GuestNote[]> => {
-  if (hasBlobToken) {
+  if (shouldUseBlob()) {
     return listFromBlob();
   }
   return listFromSqlite();
 };
 
 export const insertGuestbookNote = async (note: GuestNote): Promise<GuestNote> => {
-  if (hasBlobToken) {
+  if (shouldUseBlob()) {
     await insertToBlob(note);
     return note;
   }
@@ -125,4 +108,3 @@ export const insertGuestbookNote = async (note: GuestNote): Promise<GuestNote> =
   insertToSqlite(note);
   return note;
 };
-

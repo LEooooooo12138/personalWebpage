@@ -1,19 +1,14 @@
 "use client";
 
-import { GuestNote } from "@/types/portfolio";
 import { useCallback, useEffect, useState } from "react";
-import { Language, messages } from "@/lib/i18n";
-import { useLanguage } from "@/components/language-provider";
+import { Language } from "@/lib/i18n";
+import { useHydratedLanguage } from "@/lib/use-hydrated-language";
+import { GuestNote } from "@/types/portfolio";
 
 type AgentReply = { answer: string; source: string };
 
 export function LabPage({ serverLang }: { serverLang: Language }) {
-  const { m: ctxM, lang: ctxLang } = useLanguage();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-
-  const m = mounted ? ctxM : messages[serverLang];
-  const lang = mounted ? ctxLang : serverLang;
+  const { m, lang } = useHydratedLanguage(serverLang);
 
   const [agentQuestion, setAgentQuestion] = useState("");
   const [agentReply, setAgentReply] = useState<AgentReply | null>(null);

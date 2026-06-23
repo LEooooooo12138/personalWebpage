@@ -1,19 +1,23 @@
 import { list, put } from "@vercel/blob";
-import Database from "better-sqlite3";
-import fs from "node:fs";
-import path from "node:path";
+import { getSingletonDb, shouldUseBlob } from "@/lib/db-factory";
 
 type VisitResult = {
   count: number;
   incremented: boolean;
 };
 
-declare global {
-  var __visitDb: Database.Database | undefined;
-}
-
-const hasBlobToken = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 const VISIT_PREFIX = "visits/pages/";
+
+const SCHEMA_SQL = `
+  CREATE TABLE IF NOT EXISTS page_visits (
+    page TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (page, session_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_page_visits_page
+  ON page_visits(page);
+`;
 
 const normalizePage = (page: string) =>
   page
@@ -28,32 +32,7 @@ const normalizeSessionId = (sessionId: string) =>
     .replace(/[^a-z0-9-]/g, "")
     .slice(0, 64);
 
-const getDbPath = () => {
-  const dataDir = path.join(process.cwd(), "data");
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-  return path.join(dataDir, "visits.db");
-};
-
-const getDb = () => {
-  if (!globalThis.__visitDb) {
-    const db = new Database(getDbPath());
-    db.pragma("journal_mode = WAL");
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS page_visits (
-        page TEXT NOT NULL,
-        session_id TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        PRIMARY KEY (page, session_id)
-      );
-      CREATE INDEX IF NOT EXISTS idx_page_visits_page
-      ON page_visits(page);
-    `);
-    globalThis.__visitDb = db;
-  }
-  return globalThis.__visitDb;
-};
+/* ── Blob 后端 ── */
 
 const countPageFromBlob = async (page: string): Promise<number> => {
   let cursor: string | undefined;
@@ -92,8 +71,10 @@ const recordBlobVisit = async (page: string, sessionId: string): Promise<VisitRe
   return { count, incremented };
 };
 
+/* ── SQLite 后端 ── */
+
 const recordSqliteVisit = (page: string, sessionId: string): VisitResult => {
-  const db = getDb();
+  const db = getSingletonDb("visits", SCHEMA_SQL);
   const result = db
     .prepare(
       `
@@ -119,14 +100,16 @@ const recordSqliteVisit = (page: string, sessionId: string): VisitResult => {
   };
 };
 
+/* ── 对外接口 ── */
+
 export const getPageVisitCount = async (pageInput: string): Promise<number> => {
   const page = normalizePage(pageInput);
 
-  if (hasBlobToken) {
+  if (shouldUseBlob()) {
     return countPageFromBlob(page);
   }
 
-  const db = getDb();
+  const db = getSingletonDb("visits", SCHEMA_SQL);
   const row = db
     .prepare(
       `
@@ -150,10 +133,9 @@ export const recordPageVisit = async (
     throw new Error("Invalid session id.");
   }
 
-  if (hasBlobToken) {
+  if (shouldUseBlob()) {
     return recordBlobVisit(page, sessionId);
   }
 
   return recordSqliteVisit(page, sessionId);
 };
-

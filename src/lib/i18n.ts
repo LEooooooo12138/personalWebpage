@@ -7,10 +7,6 @@ type ExperienceItem = {
   note?: string;
 };
 
-type SkillCategory = {
-  title: string;
-  content: string;
-};
 
 export const messages = {
   en: {
@@ -62,16 +58,6 @@ export const messages = {
       terminalCleared: "Terminal cleared.",
       terminalUnknown: "Command not found.",
       languages: "Languages",
-      categoriesTitle: "Detailed Skill Overview",
-      categories: [
-        { title: "Front-End", content: "HTML, CSS, Vue, React" },
-        { title: "Back-End", content: "SQL, C++, Java, Python, Swift, PHP" },
-        {
-          title: "General",
-          content: "Git, Cloud Computing, Enterprise-level Development, Agile Project Management",
-        },
-        { title: "Basic Familiarity", content: "UE5, Unity, Maya" },
-      ] as SkillCategory[],
     },
     experience: {
       title: "Experience & Education Timeline",
@@ -225,13 +211,6 @@ export const messages = {
       terminalCleared: "终端已清空。",
       terminalUnknown: "未识别的命令。",
       languages: "语言能力",
-      categoriesTitle: "技能明细",
-      categories: [
-        { title: "前端", content: "HTML, CSS, Vue, React" },
-        { title: "后端", content: "SQL, C++, Java, Python, Swift, PHP" },
-        { title: "通用能力", content: "Git、云计算、企业级开发、敏捷项目管理" },
-        { title: "基础了解", content: "UE5、Unity、Maya" },
-      ] as SkillCategory[],
     },
     experience: {
       title: "经历与教育时间线",

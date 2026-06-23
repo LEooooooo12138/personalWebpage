@@ -1,19 +1,13 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
+import { Language } from "@/lib/i18n";
+import { useHydratedLanguage } from "@/lib/use-hydrated-language";
 import { Project } from "@/types/portfolio";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Language, messages } from "@/lib/i18n";
-import { useLanguage } from "@/components/language-provider";
 
 export function ProjectsPage({ serverLang }: { serverLang: Language }) {
-  const { m: ctxM } = useLanguage();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-
-  const m = mounted ? ctxM : messages[serverLang];
-
+  const { m, lang, mounted } = useHydratedLanguage(serverLang);
   const [projects, setProjects] = useState<Project[]>([]);
-  const clapTimer = useRef<NodeJS.Timeout | null>(null);
 
   const fetchProjects = useCallback(async () => {
     const response = await fetch("/api/projects");
@@ -23,72 +17,72 @@ export function ProjectsPage({ serverLang }: { serverLang: Language }) {
 
   useEffect(() => {
     const bootTimer = setTimeout(() => { void fetchProjects(); }, 0);
-    return () => clearTimeout(bootTimer);
+    const timer = setInterval(fetchProjects, 15000);
+    return () => { clearTimeout(bootTimer); clearInterval(timer); };
   }, [fetchProjects]);
 
-  const sendClap = useCallback(async (projectId: string, amount = 1) => {
-    await fetch(`/api/projects/${projectId}/clap`, {
+  const clap = useCallback(async (id: string) => {
+    const response = await fetch(`/api/projects/${id}/clap`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount }),
+      body: JSON.stringify({ amount: 1 }),
     });
-    fetchProjects();
-  }, [fetchProjects]);
+    if (!response.ok) return;
+    const data = (await response.json()) as { id: string; claps: number };
+    setProjects((prev) =>
+      prev.map((p) => (p.id === data.id ? { ...p, claps: data.claps } : p)),
+    );
+  }, []);
 
-  const startClapBurst = (projectId: string) => {
-    void sendClap(projectId, 1);
-    clapTimer.current = setInterval(() => { void sendClap(projectId, 1); }, 150);
-  };
-  const stopClapBurst = () => {
-    if (clapTimer.current) { clearInterval(clapTimer.current); clapTimer.current = null; }
-  };
-
-  const totalClaps = useMemo(() => projects.reduce((sum, p) => sum + p.claps, 0), [projects]);
+  const byId = m.projects?.byId ?? {};
 
   return (
     <section className="projects-page" id="projects">
       <div className="proj-header reveal" data-reveal>
-        <div className="num-lg">{String(projects.length).padStart(2, "0")}</div>
         <h2>{m.projects.title}</h2>
+        <p>想法在变，手感在变，每个项目都藏着一个思考的岔路口。</p>
       </div>
 
-      <div className="reveal-stagger" data-reveal>
-        {projects.map((project, i) => {
-          const localProject = m.projects.byId[project.id as keyof typeof m.projects.byId];
-          const num = String(i + 1).padStart(2, "0");
+      <div className="proj-list reveal-stagger" data-reveal>
+        {projects.map((project, index) => {
+          const localized = byId[project.id as keyof typeof byId];
+          const title = localized?.title ?? project.title;
+          const summary = localized?.summary ?? project.summary;
+          const videoHint = localized?.videoHint ?? project.videoHint;
+
           return (
             <div key={project.id} className="proj-row">
-              <div className="pr-num">{num}</div>
-              <div className="pr-info">
-                <h3>{localProject?.title ?? project.title}</h3>
-                <p>{localProject?.summary ?? project.summary}</p>
-                <div className="pr-tags">
-                  {project.tags.map((tag) => <span key={tag}>{tag}</span>)}
+              <span className="num">0{index + 1}</span>
+              <div className="proj-content">
+                <div className="proj-toprow">
+                  <h3>{title}</h3>
+                  <div className="proj-clap-area">
+                    <button className="clap-btn" onClick={() => clap(project.id)}>
+                      👏
+                    </button>
+                    <span>{project.claps}</span>
+                  </div>
                 </div>
-                <div className="proj-claps">
-                  {m.projects.clap} {project.claps}
+                <p className="summary">{summary}</p>
+                <div className="proj-meta">
+                  {project.tags.map((tag) => (
+                    <span key={tag} className="tag">{tag}</span>
+                  ))}
+                  <span className="hint">{videoHint}</span>
                 </div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                <button
-                  className="proj-clap-btn"
-                  onPointerDown={() => startClapBurst(project.id)}
-                  onPointerUp={stopClapBurst}
-                  onPointerLeave={stopClapBurst}
-                  onClick={() => void sendClap(project.id, 1)}
-                >
-                  {m.projects.clap}
-                </button>
               </div>
             </div>
           );
         })}
-      </div>
 
-      <div className="proj-header reveal" data-reveal style={{ marginTop: "4rem" }}>
-        <span style={{ fontFamily: "var(--mono)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
-          {m.projects.claps}: {totalClaps}
-        </span>
+        {projects.length === 0 && (
+          <div className="proj-row">
+            <span className="num">—</span>
+            <div className="proj-content">
+              <h3>{lang === "zh" ? "项目加载中..." : "Loading projects..."}</h3>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
