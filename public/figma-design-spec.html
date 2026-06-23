@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Figma Design Spec — Yuanle Yao Portfolio V3.1</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --text-secondary: #475569;
+    --muted: #64748b;
+    --border: rgba(148,163,184,0.24);
+    --accent: #3b82f6;
+    --accent-soft: #dbeafe;
+    --radius: 16px;
+    --shadow: 0 8px 24px rgba(15,23,42,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', 'Segoe UI', 'PingFang SC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+  }
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; }
+  h2 {
+    font-size: 1.5rem; font-weight: 700; margin: 2.5rem 0 1rem;
+    padding-bottom: 0.5rem; border-bottom: 2px solid var(--border);
+  }
+  h3 { font-size: 1.1rem; font-weight: 600; margin: 1.2rem 0 0.6rem; }
+  .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+  /* Color palette */
+  .palette-row {
+    display: flex; gap: 0.8rem; flex-wrap: wrap; margin: 1rem 0;
+  }
+  .swatch {
+    width: 80px; height: 80px; border-radius: 12px;
+    display: flex; align-items: flex-end; padding: 0.5rem;
+    font-size: 0.7rem; font-weight: 600; color: #fff;
+    box-shadow: var(--shadow);
+  }
+  .swatch.dark-text { color: #0f172a; }
+
+  /* Mockup frame */
+  .mockup {
+    border: 1px solid var(--border); border-radius: 20px;
+    overflow: hidden; box-shadow: var(--shadow);
+    background: var(--surface); margin: 1.5rem 0;
+  }
+  .mockup-header {
+    background: #f1f5f9; padding: 0.6rem 1rem;
+    font-size: 0.8rem; color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 0.4rem; align-items: center;
+  }
+  .mockup-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .mockup-dot.red { background: #ef4444; }
+  .mockup-dot.yellow { background: #f59e0b; }
+  .mockup-dot.green { background: #10b981; }
+  .mockup-body { padding: 1.5rem; }
+
+  /* Side by side */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
+
+  /* Bento grid mock */
+  .bento-grid {
+    display: grid; grid-template-columns: repeat(12, 1fr);
+    gap: 0.8rem;
+  }
+  .bento-card {
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 1rem; background: #fff; box-shadow: var(--shadow);
+  }
+  .bento-card.span-4 { grid-column: span 4; }
+  .bento-card.span-6 { grid-column: span 6; }
+  .bento-card.span-8 { grid-column: span 8; }
+  .bento-card.span-12 { grid-column: span 12; }
+
+  .bento-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; }
+  .bento-title { font-size: 0.95rem; font-weight: 700; margin: 0.3rem 0; }
+  .bento-placeholder {
+    height: 80px; background: linear-gradient(135deg, #dbeafe, #ede9fe);
+    border-radius: 10px; margin-top: 0.5rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; color: #4338ca;
+  }
+
+  /* Improved bento */
+  .bento-improved .bento-card {
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  }
+  .bento-improved .bento-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(59,130,246,0.4);
+    box-shadow: 0 12px 32px rgba(15,23,42,0.12);
+  }
+
+  /* Typography */
+  .type-sample { margin: 1rem 0; }
+  .type-sample .h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.15; }
+  .type-sample .h2 { font-size: 1.8rem; font-weight: 700; }
+  .type-sample .body { font-size: 1rem; color: var(--text-secondary); max-width: 560px; }
+  .type-sample .caption { font-size: 0.82rem; color: var(--muted); }
+
+  /* Comparison cards */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 900px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-col { }
+  .compare-label {
+    font-size: 0.8rem; font-weight: 700; margin-bottom: 0.8rem;
+    padding: 0.3rem 0.8rem; border-radius: 8px; display: inline-block;
+  }
+  .compare-label.before { background: #fee2e2; color: #991b1b; }
+  .compare-label.after { background: #dcfce7; color: #166534; }
+
+  /* Nav mock */
+  .nav-mock {
+    display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem;
+    border-radius: 16px; background: rgba(255,255,255,0.95);
+    border: 1px solid var(--border); margin-bottom: 1rem;
+  }
+  .nav-brand {
+    font-weight: 700; padding: 0.3rem 0.6rem; border-radius: 8px;
+    background: #f1f5f9; border: 1px solid var(--border);
+  }
+  .nav-links-mock { display: flex; gap: 0.3rem; flex: 1; justify-content: center; }
+  .nav-link-mock {
+    padding: 0.3rem 0.7rem; border-radius: 8px; font-size: 0.85rem;
+    border: 1px solid var(--border); background: #fff;
+  }
+  .nav-link-mock.active { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
+  .nav-dark-btn {
+    padding: 0.3rem 0.7rem; border-radius: 8px; font-size: 0.85rem;
+    background: #dbeafe; border: 1px solid #93c5fd; cursor: pointer;
+  }
+
+  /* Tags */
+  .tag-row {
+    display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem;
+  }
+  .tag {
+    font-size: 0.7rem; padding: 0.2rem 0.55rem; border-radius: 999px;
+    border: 1px solid rgba(148,163,184,0.3); background: #f8fafc;
+  }
+
+  /* Project card */
+  .proj-card {
+    border: 1px solid var(--border); border-radius: 14px; padding: 0.9rem;
+    background: #fff; margin-bottom: 0.6rem;
+  }
+  .proj-card h4 { font-size: 0.9rem; margin-bottom: 0.25rem; }
+  .proj-card p { font-size: 0.8rem; color: var(--text-secondary); }
+
+  /* Action buttons */
+  .btn-row { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
+  .btn {
+    padding: 0.35rem 0.8rem; border-radius: 999px; font-size: 0.8rem;
+    border: 1px solid var(--border); background: #fff; cursor: pointer;
+  }
+  .btn.primary { background: #3b82f6; color: #fff; border-color: #2563eb; }
+
+  /* Dark mode preview */
+  .dark-preview {
+    background: #0f172a; color: #e2e8f0; border-radius: 16px;
+    padding: 1.5rem; margin: 1rem 0;
+    border: 1px solid rgba(148,163,184,0.15);
+  }
+  .dark-preview .bento-card {
+    background: rgba(30,41,59,0.9); border-color: rgba(148,163,184,0.12);
+  }
+  .dark-preview .bento-placeholder {
+    background: linear-gradient(135deg, #1e3a5f, #312e81);
+  }
+  .dark-preview .nav-mock {
+    background: rgba(30,41,59,0.9); border-color: rgba(148,163,184,0.12);
+  }
+  .dark-preview .nav-brand { background: #1e293b; color: #f1f5f9; }
+  .dark-preview .nav-link-mock {
+    background: #1e293b; color: #cbd5e1; border-color: rgba(148,163,184,0.15);
+  }
+  .dark-preview .nav-link-mock.active {
+    background: #1e3a5f; border-color: #3b82f6; color: #93c5fd;
+  }
+
+  /* Section cards */
+  .insight-card {
+    border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem;
+    background: #fff; margin: 1rem 0;
+  }
+  .insight-card h4 { font-size: 1rem; color: #3b82f6; margin-bottom: 0.4rem; }
+  .insight-card ul { padding-left: 1.2rem; font-size: 0.9rem; color: var(--text-secondary); }
+  .insight-card li { margin: 0.25rem 0; }
+
+  /* Design tokens table */
+  .tokens-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+  .tokens-table th {
+    text-align: left; padding: 0.5rem 0.8rem; background: #f1f5f9;
+    font-weight: 600; border-bottom: 1px solid var(--border);
+  }
+  .tokens-table td {
+    padding: 0.45rem 0.8rem; border-bottom: 1px solid rgba(148,163,184,0.1);
+  }
+  .token-preview {
+    display: inline-block; width: 20px; height: 20px; border-radius: 4px;
+    vertical-align: middle; margin-right: 0.4rem; border: 1px solid rgba(0,0,0,0.1);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>🎨 Yuanle Yao — Portfolio V3.1 Figma Design Spec</h1>
+  <p class="subtitle">Design system, component library &amp; optimization proposals based on the current Bento/Glassmorphism foundation</p>
+
+  <!-- ========== 1. Current Design Audit ========== -->
+  <h2>1. Current Design Audit</h2>
+
+  <div class="mockup">
+    <div class="mockup-header">
+      <span class="mockup-dot red"></span>
+      <span class="mockup-dot yellow"></span>
+      <span class="mockup-dot green"></span>
+      <span style="margin-left:0.5rem">Current Home Page Layout</span>
+    </div>
+    <div class="mockup-body">
+      <!-- Nav -->
+      <div class="nav-mock">
+        <span class="nav-brand">Yuanle Yao</span>
+        <div class="nav-links-mock">
+          <span class="nav-link-mock active">Home</span>
+          <span class="nav-link-mock">Skills</span>
+          <span class="nav-link-mock">Experience</span>
+          <span class="nav-link-mock">Projects</span>
+          <span class="nav-link-mock">Lab</span>
+        </div>
+        <span class="nav-dark-btn">EN/中文</span>
+      </div>
+
+      <!-- Bento Grid -->
+      <div class="bento-grid">
+        <div class="bento-card span-8">
+          <span class="bento-label">Welcome</span>
+          <div class="bento-title">Yuanle Yao — Full-Stack Developer</div>
+          <p style="font-size:0.82rem;color:var(--text-secondary);margin:0.3rem 0">Building creative, delightful web experiences with modern tech.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem">
+            <span class="tag">🟢 Available for hire</span>
+            <span class="tag">🎯 Focus: Full-Stack Dev</span>
+            <span class="tag">⚡ Response: &lt; 2h</span>
+            <span class="tag">📍 Shanghai</span>
+          </div>
+        </div>
+        <div class="bento-card span-4">
+          <span class="bento-label">3D Scene</span>
+          <div class="bento-placeholder">✨ Three.js Particle Rings</div>
+        </div>
+        <div class="bento-card span-8">
+          <span class="bento-label">Quick Explore</span>
+          <div class="proj-card">
+            <h4>📂 Skills &amp; Tools</h4>
+            <p>Tech stack, languages, and terminal playground</p>
+          </div>
+          <div class="proj-card">
+            <h4>📝 Experience Timeline</h4>
+            <p>Education, work, and project milestones</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-card">
+    <h4>📋 Current Strengths</h4>
+    <ul>
+      <li>Clean glassmorphism aesthetic with soft blurs and subtle borders</li>
+      <li>Responsive 12-column Bento grid provides flexible card layout</li>
+      <li>Interactive elements: typewriter effect, terminal mode, clap buttons, AI chat</li>
+      <li>Three.js hero scene adds 3D visual interest</li>
+    </ul>
+  </div>
+
+  <div class="insight-card">
+    <h4>⚠️ Areas for Improvement</h4>
+    <ul>
+      <li>No dark mode — only light theme, misses an important user preference</li>
+      <li>Colors are ad-hoc hex values, not a systematic token system</li>
+      <li>Card hover effect is subtle (2px lift) — could feel more premium</li>
+      <li>Typography lacks a defined scale &amp; hierarchy</li>
+      <li>Spacing is inconsistent — mixed use of rem, px, and arbitrary values</li>
+      <li>No loading skeletons or empty states defined</li>
+      <li>Focus states and accessibility could be improved</li>
+    </ul>
+  </div>
+
+  <!-- ========== 2. Optimized Color System ========== -->
+  <h2>2. Optimized Color System</h2>
+  <p class="subtitle">Introducing a proper design token system with dark mode support</p>
+
+  <div class="split">
+    <div>
+      <h3>Light Mode Palette</h3>
+      <div class="palette-row">
+        <div class="swatch dark-text" style="background:#ffffff">White</div>
+        <div class="swatch dark-text" style="background:#f8fafc">Slate-50</div>
+        <div class="swatch dark-text" style="background:#f1f5f9">Slate-100</div>
+        <div class="swatch" style="background:#0f172a">Slate-900</div>
+        <div class="swatch" style="background:#475569">Slate-600</div>
+      </div>
+    </div>
+    <div>
+      <h3>Accent Colors</h3>
+      <div class="palette-row">
+        <div class="swatch" style="background:#2563eb">Blue-600</div>
+        <div class="swatch" style="background:#3b82f6">Blue-500</div>
+        <div class="swatch dark-text" style="background:#dbeafe">Blue-100</div>
+        <div class="swatch" style="background:#7c3aed">Violet-600</div>
+        <div class="swatch" style="background:#10b981">Emerald-500</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Design Tokens Table</h3>
+  <table class="tokens-table">
+    <tr><th>Token</th><th>Light Value</th><th>Dark Value</th><th>Usage</th></tr>
+    <tr><td><code>--color-bg</code></td><td>#f8fafc</td><td>#0f172a</td><td>Page background</td></tr>
+    <tr><td><code>--color-surface</code></td><td>rgba(255,255,255,0.95)</td><td>rgba(30,41,59,0.9)</td><td>Card backgrounds</td></tr>
+    <tr><td><code>--color-text</code></td><td>#0f172a</td><td>#f1f5f9</td><td>Primary text</td></tr>
+    <tr><td><code>--color-text-secondary</code></td><td>#475569</td><td>#94a3b8</td><td>Secondary text</td></tr>
+    <tr><td><code>--color-muted</code></td><td>#64748b</td><td>#64748b</td><td>Muted/caption text</td></tr>
+    <tr><td><code>--color-border</code></td><td>rgba(148,163,184,0.24)</td><td>rgba(148,163,184,0.12)</td><td>Card borders</td></tr>
+    <tr><td><code>--color-accent</code></td><td>#3b82f6</td><td>#60a5fa</td><td>Primary accent</td></tr>
+    <tr><td><code>--color-accent-soft</code></td><td>#dbeafe</td><td>#1e3a5f</td><td>Accent background</td></tr>
+    <tr><td><code>--color-success</code></td><td>#10b981</td><td>#34d399</td><td>Success states</td></tr>
+    <tr><td><code>--color-gradient-1</code></td><td>rgba(59,130,246,0.12)</td><td>rgba(59,130,246,0.08)</td><td>Aurora gradient</td></tr>
+    <tr><td><code>--color-gradient-2</code></td><td>rgba(16,185,129,0.13)</td><td>rgba(16,185,129,0.07)</td><td>Aurora gradient</td></tr>
+    <tr><td><code>--shadow-card</code></td><td>0 8px 24px rgba(15,23,42,0.08)</td><td>0 8px 24px rgba(0,0,0,0.3)</td><td>Card shadow</td></tr>
+    <tr><td><code>--shadow-hover</code></td><td>0 12px 32px rgba(15,23,42,0.14)</td><td>0 12px 32px rgba(0,0,0,0.5)</td><td>Card hover shadow</td></tr>
+    <tr><td><code>--radius-sm</code></td><td>8px</td><td>8px</td><td>Small elements</td></tr>
+    <tr><td><code>--radius-md</code></td><td>14px</td><td>14px</td><td>Cards</td></tr>
+    <tr><td><code>--radius-lg</code></td><td>20px</td><td>20px</td><td>Large cards, nav</td></tr>
+    <tr><td><code>--radius-full</code></td><td>999px</td><td>999px</td><td>Pills, buttons</td></tr>
+  </table>
+
+  <!-- ========== 3. Typography System ========== -->
+  <h2>3. Typography System</h2>
+  <p class="subtitle">Defined type scale with Inter as primary font, JetBrains Mono for code</p>
+
+  <div class="split">
+    <div class="type-sample">
+      <div class="h1">Display Large</div>
+      <p class="caption" style="margin-top:0.2rem">2.8rem / 800 / Inter — Hero headlines</p>
+      <div class="h2" style="margin-top:1rem">Section Heading</div>
+      <p class="caption" style="margin-top:0.2rem">1.5rem / 700 / Inter — Card titles, sections</p>
+      <div class="body" style="margin-top:1rem">
+        Body text at 1rem / 400. Used for descriptions, project summaries, and general content. Line height of 1.6 ensures readability.
+      </div>
+      <p class="caption" style="margin-top:0.2rem">1rem / 400 / Inter — Body copy</p>
+    </div>
+    <div>
+      <table class="tokens-table">
+        <tr><th>Token</th><th>Size</th><th>Weight</th><th>Line-height</th></tr>
+        <tr><td><code>--text-display</code></td><td>2.8rem</td><td>800</td><td>1.15</td></tr>
+        <tr><td><code>--text-h1</code></td><td>2rem</td><td>700</td><td>1.2</td></tr>
+        <tr><td><code>--text-h2</code></td><td>1.5rem</td><td>700</td><td>1.3</td></tr>
+        <tr><td><code>--text-h3</code></td><td>1.15rem</td><td>600</td><td>1.35</td></tr>
+        <tr><td><code>--text-body</code></td><td>1rem</td><td>400</td><td>1.6</td></tr>
+        <tr><td><code>--text-sm</code></td><td>0.88rem</td><td>400</td><td>1.5</td></tr>
+        <tr><td><code>--text-caption</code></td><td>0.78rem</td><td>500</td><td>1.4</td></tr>
+        <tr><td><code>--text-code</code></td><td>0.84rem</td><td>400</td><td>1.5</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ========== 4. Spacing System ========== -->
+  <h2>4. Spacing &amp; Layout System</h2>
+  <p class="subtitle">Based on a 4px grid: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64</p>
+
+  <table class="tokens-table">
+    <tr><th>Token</th><th>Value</th><th>Usage</th></tr>
+    <tr><td><code>--space-xs</code></td><td>0.25rem (4px)</td><td>Icon-text gap, tag gaps</td></tr>
+    <tr><td><code>--space-sm</code></td><td>0.5rem (8px)</td><td>Inline gaps, chip padding</td></tr>
+    <tr><td><code>--space-md</code></td><td>0.75rem (12px)</td><td>Card padding internal</td></tr>
+    <tr><td><code>--space-lg</code></td><td>1rem (16px)</td><td>Card gap, section padding</td></tr>
+    <tr><td><code>--space-xl</code></td><td>1.5rem (24px)</td><td>Section margins</td></tr>
+    <tr><td><code>--space-2xl</code></td><td>2rem (32px)</td><td>Page margins top</td></tr>
+    <tr><td><code>--space-3xl</code></td><td>3rem (48px)</td><td>Major section breaks</td></tr>
+    <tr><td><code>--page-width</code></td><td>min(1240px, calc(100% - 1.8rem))</td><td>Max content width</td></tr>
+  </table>
+
+  <!-- ========== 5. Component Optimizations ========== -->
+  <h2>5. Component Optimizations</h2>
+
+  <h3>5.1 Navigation — Before &amp; After</h3>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <span class="compare-label before">Current</span>
+      <div class="nav-mock">
+        <span class="nav-brand">Yuanle Yao</span>
+        <div class="nav-links-mock">
+          <span class="nav-link-mock">Home</span><span class="nav-link-mock">Skills</span>
+          <span class="nav-link-mock">Experience</span><span class="nav-link-mock">Projects</span>
+          <span class="nav-link-mock">Lab</span>
+        </div>
+        <span class="nav-dark-btn">EN/中文</span>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);margin-top:0.4rem">
+        Static glass nav with text-only links. No visual indicator of current scroll position.
+      </p>
+    </div>
+    <div class="compare-col">
+      <span class="compare-label after">Optimized</span>
+      <div class="nav-mock" style="backdrop-filter:blur(16px);border-color:rgba(59,130,246,0.2)">
+        <span class="nav-brand" style="display:flex;align-items:center;gap:0.4rem">
+          <span style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block"></span>
+          YY
+        </span>
+        <div class="nav-links-mock">
+          <span class="nav-link-mock active" style="display:flex;align-items:center;gap:0.3rem">
+            <span>🏠</span> Home
+          </span>
+          <span class="nav-link-mock" style="display:flex;align-items:center;gap:0.3rem">
+            <span>⚡</span> Skills
+          </span>
+          <span class="nav-link-mock" style="display:flex;align-items:center;gap:0.3rem">
+            <span>📋</span> Exp
+          </span>
+          <span class="nav-link-mock" style="display:flex;align-items:center;gap:0.3rem">
+            <span>🚀</span> Projects
+          </span>
+          <span class="nav-link-mock" style="display:flex;align-items:center;gap:0.3rem">
+            <span>🧪</span> Lab
+          </span>
+        </div>
+        <div style="display:flex;gap:0.4rem">
+          <span class="nav-dark-btn" style="background:#fff">🌙</span>
+          <span class="nav-dark-btn">EN</span>
+        </div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);margin-top:0.4rem">
+        Emoji icons for quick scanning, online status dot, dark mode toggle, simplified brand to "YY" monogram.
+      </p>
+    </div>
+  </div>
+
+  <h3>5.2 Card States — Before &amp; After</h3>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <span class="compare-label before">Current</span>
+      <div style="display:flex;gap:0.8rem">
+        <div class="bento-card" style="flex:1;text-align:center">
+          <div class="bento-title">Default</div>
+          <div class="bento-placeholder">Content</div>
+        </div>
+        <div class="bento-card" style="flex:1;text-align:center;transform:translateY(-2px);border-color:rgba(96,165,250,0.35)">
+          <div class="bento-title">Hover</div>
+          <div class="bento-placeholder">Content</div>
+        </div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);margin-top:0.4rem">
+        2px lift + blue border. Lacks focus, loading, or empty states.
+      </p>
+    </div>
+    <div class="compare-col">
+      <span class="compare-label after">Optimized</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
+        <div class="bento-card" style="text-align:center;padding:0.5rem">
+          <div class="bento-title" style="font-size:0.7rem">Default</div>
+          <div class="bento-placeholder" style="height:40px;font-size:0.6rem">Resting</div>
+        </div>
+        <div class="bento-card" style="text-align:center;padding:0.5rem;transform:translateY(-3px);box-shadow:0 12px 32px rgba(15,23,42,0.14);border-color:rgba(59,130,246,0.4)">
+          <div class="bento-title" style="font-size:0.7rem">Hover</div>
+          <div class="bento-placeholder" style="height:40px;font-size:0.6rem">Lifted</div>
+        </div>
+        <div class="bento-card" style="text-align:center;padding:0.5rem;border-color:rgba(59,130,246,0.6);outline:2px solid rgba(59,130,246,0.3);outline-offset:2px">
+          <div class="bento-title" style="font-size:0.7rem">Focus</div>
+          <div class="bento-placeholder" style="height:40px;font-size:0.6rem">Focused</div>
+        </div>
+        <div class="bento-card" style="text-align:center;padding:0.5rem">
+          <div class="bento-title" style="font-size:0.7rem">Loading</div>
+          <div class="bento-placeholder" style="height:40px;font-size:0.6rem;background:linear-gradient(90deg,#e2e8f0,#f1f5f9,#e2e8f0);background-size:200% 100%;animation:shimmer 1.5s infinite"></div>
+        </div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);margin-top:0.4rem">
+        3px lift, focus ring, loading skeleton. All 4 states defined.
+      </p>
+    </div>
+  </div>
+
+  <h3>5.3 Project Cards — Before &amp; After</h3>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <span class="compare-label before">Current</span>
+      <div class="proj-card">
+        <p style="font-size:0.7rem;color:var(--muted)">▶ Video walkthrough available</p>
+        <h4>Project Name</h4>
+        <p>A short summary of the project.</p>
+        <div class="tag-row">
+          <span class="tag">React</span><span class="tag">Node.js</span><span class="tag">MongoDB</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn">👏 Clap 12</button>
+        </div>
+      </div>
+    </div>
+    <div class="compare-col">
+      <span class="compare-label after">Optimized</span>
+      <div class="proj-card" style="display:grid;grid-template-columns:80px 1fr;gap:0.8rem">
+        <div style="background:linear-gradient(135deg,#dbeafe,#ede9fe);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">🎬</div>
+        <div>
+          <p style="font-size:0.65rem;color:var(--muted);margin:0">▶ Video walkthrough</p>
+          <h4 style="margin:0.15rem 0">Project Name</h4>
+          <p style="font-size:0.78rem;color:var(--text-secondary);margin:0.15rem 0">A short summary of the project.</p>
+          <div class="tag-row">
+            <span class="tag">React</span><span class="tag">Node.js</span><span class="tag">MongoDB</span>
+          </div>
+          <div class="btn-row" style="margin-top:0.4rem">
+            <button class="btn">🔗 Live</button>
+            <button class="btn">📂 Source</button>
+            <button class="btn">👏 12</button>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);margin-top:0.4rem">
+        Thumbnail column, live/source links, better visual hierarchy.
+      </p>
+    </div>
+  </div>
+
+  <!-- ========== 6. Dark Mode Preview ========== -->
+  <h2>6. Dark Mode — Full Preview</h2>
+  <p class="subtitle">Added via CSS custom properties + prefers-color-scheme + manual toggle</p>
+
+  <div class="mockup">
+    <div class="mockup-header">
+      <span class="mockup-dot red"></span>
+      <span class="mockup-dot yellow"></span>
+      <span class="mockup-dot green"></span>
+      <span style="margin-left:0.5rem">Dark Mode — Home Page</span>
+    </div>
+    <div class="mockup-body dark-preview">
+      <div class="nav-mock" style="backdrop-filter:blur(16px)">
+        <span class="nav-brand" style="display:flex;align-items:center;gap:0.4rem">
+          <span style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block"></span>
+          YY
+        </span>
+        <div class="nav-links-mock">
+          <span class="nav-link-mock active">Home</span>
+          <span class="nav-link-mock">Skills</span>
+          <span class="nav-link-mock">Experience</span>
+          <span class="nav-link-mock">Projects</span>
+          <span class="nav-link-mock">Lab</span>
+        </div>
+        <span class="nav-dark-btn" style="background:#fbbf24;color:#0f172a">☀️</span>
+      </div>
+      <div class="bento-grid" style="margin-top:1rem">
+        <div class="bento-card span-8">
+          <span class="bento-label">Welcome</span>
+          <div class="bento-title">Yuanle Yao — Full-Stack Developer</div>
+          <p style="font-size:0.82rem;color:#94a3b8;margin:0.3rem 0">Building creative, delightful web experiences.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem">
+            <span class="tag">🟢 Available</span>
+            <span class="tag">🎯 Full-Stack</span>
+            <span class="tag">⚡ &lt; 2h</span>
+            <span class="tag">📍 Shanghai</span>
+          </div>
+        </div>
+        <div class="bento-card span-4">
+          <span class="bento-label">3D Scene</span>
+          <div class="bento-placeholder">✨ Particle Rings</div>
+        </div>
+        <div class="bento-card span-8">
+          <span class="bento-label">Quick Explore</span>
+          <div class="proj-card" style="background:rgba(30,41,59,0.7);border-color:rgba(148,163,184,0.1)">
+            <h4>📂 Skills &amp; Tools</h4>
+            <p>Tech stack, languages, and terminal playground</p>
+          </div>
+          <div class="proj-card" style="background:rgba(30,41,59,0.7);border-color:rgba(148,163,184,0.1)">
+            <h4>📝 Experience Timeline</h4>
+            <p>Education, work, and project milestones</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 7. Micro-interactions ========== -->
+  <h2>7. Micro-interactions &amp; Animations</h2>
+
+  <table class="tokens-table">
+    <tr><th>Element</th><th>Current</th><th>Optimized</th></tr>
+    <tr>
+      <td>Page entry</td>
+      <td>Fade up + slide (0.35s, ease)</td>
+      <td>Staggered children (50ms delay each), spring physics</td>
+    </tr>
+    <tr>
+      <td>Card hover</td>
+      <td>translateY(-2px), 0.2s</td>
+      <td>translateY(-3px) + scale(1.01), 0.25s cubic-bezier</td>
+    </tr>
+    <tr>
+      <td>Button press</td>
+      <td>None</td>
+      <td>scale(0.96) on :active, 0.1s</td>
+    </tr>
+    <tr>
+      <td>Nav link hover</td>
+      <td>Background color swap</td>
+      <td>Background + subtle underline indicator + scale(1.02)</td>
+    </tr>
+    <tr>
+      <td>Page transition (new)</td>
+      <td>None</td>
+      <td>Cross-fade with slight slide (150ms)</td>
+    </tr>
+    <tr>
+      <td>Clap button (new)</td>
+      <td>Numeric update only</td>
+      <td>Scale bounce + particle burst on click</td>
+    </tr>
+    <tr>
+      <td>Loading state (new)</td>
+      <td>None</td>
+      <td>Skeleton shimmer animation</td>
+    </tr>
+    <tr>
+      <td>Scroll reveal (new)</td>
+      <td>None</td>
+      <td>Fade-up on scroll into view (IntersectionObserver)</td>
+    </tr>
+  </table>
+
+  <!-- ========== 8. Page Layout Proposals ========== -->
+  <h2>8. Page Layout Optimization Proposals</h2>
+
+  <h3>8.1 Home Page — Current vs. Optimized</h3>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <span class="compare-label before">Current Layout</span>
+      <div class="bento-grid" style="font-size:0.75rem">
+        <div class="bento-card span-8">
+          <span class="bento-label">Hero (8 cols)</span>
+          <div style="height:60px"></div>
+        </div>
+        <div class="bento-card span-4">
+          <span class="bento-label">3D Scene (4 cols)</span>
+          <div class="bento-placeholder" style="height:60px"></div>
+        </div>
+        <div class="bento-card span-8">
+          <span class="bento-label">Quick Links (8 cols)</span>
+          <div style="height:40px"></div>
+        </div>
+        <!-- Empty right column -->
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);margin-top:0.4rem">
+        Right 4 columns empty on second row. Visit counter is a floating pill.
+      </p>
+    </div>
+    <div class="compare-col">
+      <span class="compare-label after">Optimized Layout</span>
+      <div class="bento-grid" style="font-size:0.75rem">
+        <div class="bento-card span-8">
+          <span class="bento-label">Hero + Typewriter (8 cols)</span>
+          <div style="height:60px"></div>
+        </div>
+        <div class="bento-card span-4">
+          <span class="bento-label">3D Scene (4 cols)</span>
+          <div class="bento-placeholder" style="height:60px"></div>
+        </div>
+        <div class="bento-card span-4">
+          <span class="bento-label">Live Status (4 cols)</span>
+          <div style="height:45px"></div>
+        </div>
+        <div class="bento-card span-4">
+          <span class="bento-label">Recent Activity (4 cols)</span>
+          <div style="height:45px"></div>
+        </div>
+        <div class="bento-card span-4">
+          <span class="bento-label">Quick Links (4 cols)</span>
+          <div style="height:45px"></div>
+        </div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);margin-top:0.4rem">
+        Even 4-4-4 row fills the grid. Status gets its own card. Visit counter integrated into a stats card.
+      </p>
+    </div>
+  </div>
+
+  <h3>8.2 Skills Page — Terminal Mode Polish</h3>
+  <div class="insight-card">
+    <h4>🎯 Proposed Improvements</h4>
+    <ul>
+      <li>Terminal gets proper syntax highlighting (green prompt, blue dirs, white text)</li>
+      <li>Add <code>tab</code> autocomplete suggestions dropdown</li>
+      <li>Command history with ↑↓ arrow key navigation</li>
+      <li>ASCII art banner on <code>whoami</code></li>
+      <li>Skill pills get category-colored borders (blue=frontend, green=backend, etc.)</li>
+    </ul>
+  </div>
+
+  <h3>8.3 Experience Page — Timeline Enhancement</h3>
+  <div class="insight-card">
+    <h4>🎯 Proposed Improvements</h4>
+    <ul>
+      <li>Add company/school logos next to each timeline entry</li>
+      <li>Alternating left/right timeline for desktop (more visual interest)</li>
+      <li>Animated timeline line that "draws" on scroll</li>
+      <li>Duration badges (e.g., "2 years", "4 months")</li>
+    </ul>
+  </div>
+
+  <!-- ========== 9. Implementation Priority ========== -->
+  <h2>9. Implementation Priority</h2>
+
+  <table class="tokens-table">
+    <tr><th>Priority</th><th>Optimization</th><th>Effort</th><th>Impact</th></tr>
+    <tr>
+      <td>🥇 P0</td>
+      <td>Design token system (CSS custom properties for colors, spacing, typography)</td>
+      <td>Medium</td>
+      <td>Foundation for everything</td>
+    </tr>
+    <tr>
+      <td>🥇 P0</td>
+      <td>Dark mode support</td>
+      <td>Medium</td>
+      <td>Major UX improvement</td>
+    </tr>
+    <tr>
+      <td>🥈 P1</td>
+      <td>Nav redesign (icons, status dot, monogram, dark toggle)</td>
+      <td>Small</td>
+      <td>First impression</td>
+    </tr>
+    <tr>
+      <td>🥈 P1</td>
+      <td>Card states (hover, focus, loading, empty)</td>
+      <td>Small</td>
+      <td>Polish &amp; a11y</td>
+    </tr>
+    <tr>
+      <td>🥈 P1</td>
+      <td>Home page layout rebalance (4-4-4 row)</td>
+      <td>Small</td>
+      <td>Better use of space</td>
+    </tr>
+    <tr>
+      <td>🥉 P2</td>
+      <td>Project card redesign (thumbnails, source/live links)</td>
+      <td>Small</td>
+      <td>Better portfolio UX</td>
+    </tr>
+    <tr>
+      <td>🥉 P2</td>
+      <td>Micro-interactions (staggered entry, button feedback, scroll reveal)</td>
+      <td>Small</td>
+      <td>Premium feel</td>
+    </tr>
+    <tr>
+      <td>🥉 P2</td>
+      <td>Loading skeletons</td>
+      <td>Small</td>
+      <td>Perceived performance</td>
+    </tr>
+    <tr>
+      <td>🏁 P3</td>
+      <td>Terminal enhancements (syntax highlighting, autocomplete, history)</td>
+      <td>Medium</td>
+      <td>Delight</td>
+    </tr>
+    <tr>
+      <td>🏁 P3</td>
+      <td>Experience timeline polish (logos, alternating layout, draw animation)</td>
+      <td>Medium</td>
+      <td>Visual storytelling</td>
+    </tr>
+  </table>
+
+  <p style="margin-top:2rem;padding:1rem;background:#dbeafe;border-radius:12px;font-size:0.9rem">
+    💡 <strong>Next Step:</strong> I'll translate this spec into a structured implementation plan.
+    You can review this document, give feedback on any section, and once you're happy with the direction,
+    I'll create a step-by-step plan and implement the changes one by one.
+  </p>
+
+</div>
+
+<style>
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+</style>
+</body>
+</html>

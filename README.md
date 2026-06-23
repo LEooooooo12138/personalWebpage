@@ -1,7 +1,30 @@
-# Yuanle Yao
+# Yuanle Yao — Personal Website V3
 
-This is Yao Yuanle's personal homepage. This website aims to help you better understand Yao Yuanle, and this is my first VUE project for getting familiar with react code.
+A full-stack portfolio with editorial design, real-time interactions, and a narrative experience timeline.
 
-This project is developed based on react
+Built with **Next.js 16** + **TypeScript** + **Tailwind CSS**.
 
-You can visit from yaoyuanle.top
+## Development
+
+```bash
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build
+```
+
+## Structure
+
+```
+src/
+  app/            # Next.js App Router pages + API routes
+  components/     # React components
+    pages/        # Page-level components (home, experience, skills, projects, lab)
+  lib/            # Data, i18n, DB helpers, narrative data
+  types/          # TypeScript type definitions
+data/             # SQLite databases (guestbook, visits)
+public/           # Static assets
+```
+
+## Deployment
+
+Automatically deployed via GitHub Actions to Vercel on push to `master`.
