@@ -34,25 +34,60 @@ export const profile = {
 
 export const experiences: ExperienceNode[] = [
   {
-    year: "2026",
-    title: "V3 Personal Website (In Progress)",
+    year: "2018",
+    title: "Study Abroad Start - Trinity College, Melbourne",
     description:
-      "Building a full-stack portfolio with Bento UI, real-time interactions, and AI-powered resume assistant.",
-    repoHint: "github.com/LEooooooo12138/personalWebpage/tree/v3",
+      "I arrived in Melbourne and began my study abroad life at Trinity College. In a new environment, I learned independent living, made new friends, and adapted to a different learning style.",
+    note: "Keyword: adaptation and self-management",
   },
   {
-    year: "2024-2025",
-    title: "Full-Stack Internship Projects",
+    year: "2019",
+    title: "Monash University - Bachelor of Information Technology",
     description:
-      "Worked on APIs, dashboard features, and delivery pipelines with cross-functional team collaboration.",
-    repoHint: "Commits and project docs available on request.",
+      "I entered Monash University and started systematic software development learning. Coursework demanded strong self-learning and time management, which strengthened my engineering foundation.",
+    note: "Keyword: software fundamentals and autonomy",
+  },
+  {
+    year: "2020-2021",
+    title: "Online Study During Pandemic",
+    description:
+      "During the pandemic, I continued online study from China. Although communication was harder, this period improved my consistency and focus on academic progress.",
+    note: "Keyword: resilience and consistency",
+  },
+  {
+    year: "2022",
+    title: "Campus Return and Graduation Stage",
+    description:
+      "After returning to campus, I balanced graduation project pressure and team collaboration, improving my delivery capability under constraints.",
+    note: "Keyword: delivery under pressure",
   },
   {
     year: "2023",
-    title: "UTS - Master Study in Software Development",
+    title: "UTS Master Program - Software Development",
     description:
-      "Advanced software engineering focus with practical product and architecture projects.",
-    repoHint: "Course and project highlights can be mapped in this site.",
+      "I moved from Melbourne to Sydney and began my master studies at UTS. New city context expanded my adaptability and product perspective.",
+    note: "Keyword: advanced study and cross-city transition",
+  },
+  {
+    year: "2024",
+    title: "Internship + Personal Website Iteration",
+    description:
+      "While studying, I also worked on internship tasks and continued improving my personal website, integrating frontend, backend, and UX into one workflow.",
+    note: "Keyword: full-stack practice",
+  },
+  {
+    year: "2025",
+    title: "Research Assistant - Zhejiang University",
+    description:
+      "Served as a research assistant at Zhejiang University, focusing on AI-vision related projects, model experimentation, and practical implementation support.",
+    note: "Keyword: AI vision research",
+  },
+  {
+    year: "2026",
+    title: "Software Engineer - AI Negotiate Co., Ltd.",
+    description:
+      "Currently working at AI Negotiate Co., Ltd., participating in product development and technical implementation while continuing the V3 portfolio build.",
+    note: "Keyword: current role and product engineering",
   },
 ];
 

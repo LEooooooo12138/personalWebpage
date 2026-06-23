@@ -28,5 +28,5 @@ export type ExperienceNode = {
   year: string;
   title: string;
   description: string;
-  repoHint: string;
+  note?: string;
 };
