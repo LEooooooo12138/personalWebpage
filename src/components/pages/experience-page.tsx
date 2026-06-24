@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Language } from "@/lib/i18n";
 import { useHydratedLanguage } from "@/lib/use-hydrated-language";
 import { narrativeEn, narrativeZh } from "@/lib/experience-narrative";
+import { ExperienceNode } from "@/types/portfolio";
+import { SkillTag } from "@/components/SkillTag";
 
 const NS = { narrativeEn, narrativeZh };
 
@@ -34,6 +36,7 @@ export function ExperiencePage({ serverLang }: { serverLang: Language }) {
   const itemsRef = useRef<HTMLDivElement>(null);
   const itemEls = useRef<(HTMLDivElement | null)[]>([]);
   const rafId = useRef(0);
+  const [expSkills, setExpSkills] = useState<Map<string, { name: string; category: string; color: string }[]>>(new Map());
 
   useEffect(() => {
     if (!mounted) return;
@@ -63,6 +66,22 @@ export function ExperiencePage({ serverLang }: { serverLang: Language }) {
     rafId.current = requestAnimationFrame(loop);
     return () => { running = false; cancelAnimationFrame(rafId.current); };
   }, [mounted]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    fetch(`/api/experiences?lang=${lang}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const map = new Map();
+        for (const exp of data) {
+          if (exp.skills && exp.skills.length > 0) {
+            map.set(exp.year, exp.skills);
+          }
+        }
+        setExpSkills(map);
+      })
+      .catch(() => {});
+  }, [mounted, lang]);
 
   const toggle = useCallback((i: number) => {
     setExpanded((prev) => (prev === i ? null : i));
@@ -125,6 +144,14 @@ export function ExperiencePage({ serverLang }: { serverLang: Language }) {
                   {keywords.length > 0 && (
                     <div className="exp-tags">
                       {keywords.map((kw) => <span key={kw} className="exp-tag">{kw}</span>)}
+                    </div>
+                  )}
+
+                  {expSkills.has(item.year) && expSkills.get(item.year)!.length > 0 && (
+                    <div className="exp-tech-tags">
+                      {expSkills.get(item.year)!.map((s) => (
+                        <SkillTag key={s.name} name={s.name} color={s.color} size="sm" />
+                      ))}
                     </div>
                   )}
 
