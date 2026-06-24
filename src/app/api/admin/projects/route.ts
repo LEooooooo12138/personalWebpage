@@ -18,6 +18,7 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json().catch(() => ({}));
-  createProject(body);
+  const { zh_title, zh_summary, zh_video_hint, ...projectFields } = body;
+  createProject({ ...projectFields, zh_title, zh_summary, zh_video_hint });
   return NextResponse.json({ ok: true }, { status: 201 });
 }

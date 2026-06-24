@@ -8,7 +8,8 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
 
   const { id } = await context.params;
   const body = await request.json().catch(() => ({}));
-  updateProject(id, body);
+  const { zh_title, zh_summary, zh_video_hint, ...projectFields } = body;
+  updateProject(id, { ...projectFields, zh_title, zh_summary, zh_video_hint });
   return NextResponse.json({ ok: true });
 }
 

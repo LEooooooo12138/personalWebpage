@@ -18,6 +18,7 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json().catch(() => ({}));
-  const id = createExperience(body);
+  const { zh_title, zh_description, zh_note, ...expFields } = body;
+  const id = createExperience({ ...expFields, zh_title, zh_description, zh_note });
   return NextResponse.json({ ok: true, id }, { status: 201 });
 }
