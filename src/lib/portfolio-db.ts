@@ -174,6 +174,7 @@ function runMigrations(db: Database.Database) {
     migrateFromGuestbookDb(db);
     migrateFromVisitsDb(db);
     seedStaticData(db);
+    migrateProjectTags(db);
   }
   // Always ensure admin user exists (re-seed if deleted)
   seedAdminUser(db);
