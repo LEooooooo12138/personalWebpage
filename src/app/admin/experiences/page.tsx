@@ -19,7 +19,7 @@ export default function AdminExperiencesPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Exp | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Exp | null>(null);
-  const [form, setForm] = useState({ year: "", title: "", description: "", note: "" });
+  const [form, setForm] = useState({ year: "", title: "", description: "", note: "", zh_title: "", zh_description: "", zh_note: "" });
 
   const [allSkills, setAllSkills] = useState<{ name: string; category: string; color: string }[]>([]);
   const [pickedSkills, setPickedSkills] = useState<string[]>([]);
@@ -52,8 +52,8 @@ export default function AdminExperiencesPage() {
       .catch(() => {});
   }, []);
 
-  const openCreate = () => { setEditing(null); setForm({ year: "", title: "", description: "", note: "" }); setPickedSkills([]); setModalOpen(true); };
-  const openEdit = (r: Exp) => { setEditing(r); setForm({ year: r.year, title: r.title, description: r.description, note: r.note || "" }); setModalOpen(true); const existingSkills = (r as any).skills?.map((s: any) => s.name) || []; setPickedSkills(existingSkills); };
+  const openCreate = () => { setEditing(null); setForm({ year: "", title: "", description: "", note: "", zh_title: "", zh_description: "", zh_note: "" }); setPickedSkills([]); setModalOpen(true); };
+  const openEdit = (r: Exp) => { setEditing(r); setForm({ year: r.year, title: (r as any).en_title || r.title, description: (r as any).en_description || r.description, note: (r as any).en_note || r.note || "", zh_title: (r as any).zh_title || "", zh_description: (r as any).zh_description || "", zh_note: (r as any).zh_note || "" }); setModalOpen(true); const existingSkills = (r as any).skills?.map((s: any) => s.name) || []; setPickedSkills(existingSkills); };
 
   const save = async () => {
     const m = editing ? "PUT" : "POST";
@@ -116,6 +116,15 @@ export default function AdminExperiencesPage() {
           <div><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-[0.06em] mb-2">Title</label><input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/15 focus:border-blue-600 transition-all" /></div>
           <div><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-[0.06em] mb-2">Description</label><textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4} className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/15 focus:border-blue-600 transition-all resize-none" /></div>
           <div><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-[0.06em] mb-2">Note <span className="font-normal text-gray-400">(optional)</span></label><input value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/15 focus:border-blue-600 transition-all" /></div>
+          {/* ── Chinese i18n ── */}
+          <div className="border-t border-gray-100 pt-5 mt-2">
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-[0.06em] mb-4">Chinese (中文) Translation</p>
+            <div className="space-y-5">
+              <div><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-[0.06em] mb-2">Title (中文)</label><input value={form.zh_title} onChange={(e) => setForm({ ...form, zh_title: e.target.value })} placeholder="Leave blank to use English title" className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/15 focus:border-blue-600 transition-all" /></div>
+              <div><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-[0.06em] mb-2">Description (中文)</label><textarea value={form.zh_description} onChange={(e) => setForm({ ...form, zh_description: e.target.value })} rows={4} placeholder="Leave blank to use English description" className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/15 focus:border-blue-600 transition-all resize-none" /></div>
+              <div><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-[0.06em] mb-2">Note (中文) <span className="font-normal text-gray-400">(optional)</span></label><input value={form.zh_note} onChange={(e) => setForm({ ...form, zh_note: e.target.value })} placeholder="Leave blank to use English note" className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/15 focus:border-blue-600 transition-all" /></div>
+            </div>
+          </div>
           <div>
             <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-[0.06em] mb-2">
               Skills <span className="font-normal text-gray-400">(select from skill library)</span>
