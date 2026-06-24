@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Language } from "@/lib/i18n";
 import { useHydratedLanguage } from "@/lib/use-hydrated-language";
 import { narrativeEn, narrativeZh } from "@/lib/experience-narrative";
-import { ExperienceNode } from "@/types/portfolio";
+import { ExperienceNode, ProjectSkill } from "@/types/portfolio";
 import { SkillTag } from "@/components/SkillTag";
 
 const NS = { narrativeEn, narrativeZh };
@@ -67,21 +67,9 @@ export function ExperiencePage({ serverLang }: { serverLang: Language }) {
     return () => { running = false; cancelAnimationFrame(rafId.current); };
   }, [mounted]);
 
-  useEffect(() => {
-    if (!mounted) return;
-    fetch(`/api/experiences?lang=${lang}`)
-      .then((r) => r.json())
-      .then((data) => {
-        const map = new Map();
-        for (const exp of data) {
-          if (exp.skills && exp.skills.length > 0) {
-            map.set(exp.year, exp.skills);
-          }
-        }
-        setExpSkills(map);
-      })
-      .catch(() => {});
-  }, [mounted, lang]);
+
+  // Skills now come from the DB experiences fetch above
+
 
   const toggle = useCallback((i: number) => {
     setExpanded((prev) => (prev === i ? null : i));
@@ -90,7 +78,18 @@ export function ExperiencePage({ serverLang }: { serverLang: Language }) {
   const narratives = lang === "zh" ? NS.narrativeZh : NS.narrativeEn;
   const narMap = new Map(narratives.map((n) => [n.year, n]));
 
-  const years = m.experience.items.map((item) => item.year);
+  const [dbExperiences, setDbExperiences] = useState<(ExperienceNode & { id: string; skills?: ProjectSkill[] })[]>([]);
+  useEffect(() => {
+    if (!mounted) return;
+    fetch(`/api/experiences?lang=${lang}`)
+      .then((r) => r.json())
+      .then((data) => setDbExperiences(data))
+      .catch(() => {});
+  }, [mounted, lang]);
+
+  // Use DB data when available, fallback to i18n.ts hardcoded items
+  const items = dbExperiences.length > 0 ? dbExperiences : m.experience.items;
+  const years = items.map((item) => item.year);
   const firstYear = years[0] ?? "2018";
   const lastYear = years[years.length - 1] ?? "2026";
 
@@ -114,10 +113,12 @@ export function ExperiencePage({ serverLang }: { serverLang: Language }) {
         )}
 
         <div className="reveal-stagger" data-reveal>
-          {m.experience.items.map((item, i) => {
+          {items.map((item, i) => {
             const keywords = parseKeywords(item.note);
             const nar = narMap.get(item.year);
             const hasDetail = !!(nar?.bullets.length || nar?.reflection);
+            // Use DB skills if available, else fallback to separate expSkills fetch
+            const itemSkills = (item as any).skills || expSkills.get(item.year) || [];
             const isOpen = expanded === i;
 
             return (
@@ -147,9 +148,9 @@ export function ExperiencePage({ serverLang }: { serverLang: Language }) {
                     </div>
                   )}
 
-                  {expSkills.has(item.year) && expSkills.get(item.year)!.length > 0 && (
+                  {itemSkills.length > 0 && (
                     <div className="exp-tech-tags">
-                      {expSkills.get(item.year)!.map((s) => (
+                      {itemSkills.map((s: any) => (
                         <SkillTag key={s.name} name={s.name} color={s.color} size="sm" category={s.category || undefined} />
                       ))}
                     </div>

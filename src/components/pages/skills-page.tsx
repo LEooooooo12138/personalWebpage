@@ -186,7 +186,7 @@ export function SkillsPage({
                   {cat.description && (
                     <p className="skills-row-desc">{cat.description}</p>
                   )}
-                  {usageData && isOpen && (() => {
+                  {usageData && usageData.categories && isOpen && (() => {
                     const usageCat = usageData.categories.find((c) => c.id === cat.id);
                     if (!usageCat) return null;
                     // Collect unique project and experience refs across all skills in this category

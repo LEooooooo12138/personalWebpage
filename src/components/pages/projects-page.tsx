@@ -11,10 +11,10 @@ export function ProjectsPage({ serverLang }: { serverLang: Language }) {
   const [projects, setProjects] = useState<(Project & { skills?: ProjectSkill[] })[]>([]);
 
   const fetchProjects = useCallback(async () => {
-    const response = await fetch("/api/projects");
+    const response = await fetch(`/api/projects?lang=${lang}`);
     if (!response.ok) return;
     setProjects((await response.json()) as (Project & { skills?: ProjectSkill[] })[]);
-  }, []);
+  }, [lang]);
 
   useEffect(() => {
     const bootTimer = setTimeout(() => { void fetchProjects(); }, 0);
@@ -41,15 +41,16 @@ export function ProjectsPage({ serverLang }: { serverLang: Language }) {
     <section className="projects-page" id="projects">
       <div className="proj-header reveal" data-reveal>
         <h2>{m.projects.title}</h2>
-        <p>想法在变，手感在变，每个项目都藏着一个思考的岔路口。</p>
+        <p>{lang === "zh" ? "想法在变，手感在变，每个项目都藏着一个思考的岔路口。" : "Ideas evolve, touch changes — every project hides a fork in thought."}</p>
       </div>
 
       <div className="proj-list reveal-stagger" data-reveal>
         {projects.map((project, index) => {
+          // API returns localized data from DB, with hardcoded byId as fallback
           const localized = byId[project.id as keyof typeof byId];
-          const title = localized?.title ?? project.title;
-          const summary = localized?.summary ?? project.summary;
-          const videoHint = localized?.videoHint ?? project.videoHint;
+          const title = project.title || localized?.title || "";
+          const summary = project.summary || localized?.summary || "";
+          const videoHint = project.videoHint || localized?.videoHint || "";
 
           return (
             <div key={project.id} className="proj-row">
