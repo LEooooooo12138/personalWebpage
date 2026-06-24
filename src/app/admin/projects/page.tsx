@@ -19,7 +19,7 @@ export default function AdminProjectsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<P | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<P | null>(null);
-  const [form, setForm] = useState({ id: "", title: "", summary: "", tags: "", demoUrl: "", repoUrl: "", videoHint: "" });
+  const [form, setForm] = useState({ id: "", title: "", summary: "", tags: "", demoUrl: "", repoUrl: "", videoHint: "", timePeriod: "", zh_title: "", zh_summary: "", zh_video_hint: "" });
   const [allSkills, setAllSkills] = useState<{ name: string; category: string; color: string }[]>([]);
   const [pickedSkills, setPickedSkills] = useState<string[]>([]);
 
@@ -50,11 +50,11 @@ export default function AdminProjectsPage() {
       .catch(() => {});
   }, []);
 
-  const openCreate = () => { setEditing(null); setForm({ id: "", title: "", summary: "", tags: "", demoUrl: "", repoUrl: "", videoHint: "" }); setPickedSkills([]); setModalOpen(true); };
-  const openEdit = (r: P) => { setEditing(r); setForm({ id: r.id, title: r.title, summary: r.summary, tags: r.tags.join(", "), demoUrl: r.demoUrl, repoUrl: r.repoUrl, videoHint: r.videoHint }); setModalOpen(true); const existingSkills = (r as any).skills?.map((s: any) => s.name) || []; setPickedSkills(existingSkills); };
+  const openCreate = () => { setEditing(null); setForm({ id: "", title: "", summary: "", tags: "", demoUrl: "", repoUrl: "", videoHint: "", timePeriod: "", zh_title: "", zh_summary: "", zh_video_hint: "" }); setPickedSkills([]); setModalOpen(true); };
+  const openEdit = (r: P) => { setEditing(r); setForm({ id: r.id, title: (r as any).en_title || r.title, summary: (r as any).en_summary || r.summary, tags: r.tags.join(", "), demoUrl: r.demoUrl, repoUrl: r.repoUrl, videoHint: (r as any).en_video_hint || r.videoHint, timePeriod: (r as any).timePeriod || "", zh_title: (r as any).zh_title || "", zh_summary: (r as any).zh_summary || "", zh_video_hint: (r as any).zh_video_hint || "" }); setModalOpen(true); const existingSkills = (r as any).skills?.map((s: any) => s.name) || []; setPickedSkills(existingSkills); };
 
   const save = async () => {
-    const payload = { ...form, tags: form.tags.split(",").map((s) => s.trim()).filter(Boolean), skills: pickedSkills };
+    const payload = { ...form, tags: form.tags.split(",").map((s) => s.trim()).filter(Boolean), skills: pickedSkills, timePeriod: form.timePeriod };
     const m = editing ? "PUT" : "POST";
     const u = editing ? `/api/admin/projects/${editing.id}` : "/api/admin/projects";
     await fetch(u, { method: m, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
@@ -64,7 +64,7 @@ export default function AdminProjectsPage() {
 
   const cols: Column<P>[] = [
     { key: "id", header: "ID", render: (r) => <span className="text-gray-400 font-mono text-xs">{r.id}</span>, className: "w-36" },
-    { key: "t", header: "Title", render: (r) => <span className="font-semibold text-gray-800">{r.title}</span> },
+    { key: "t", header: "Title", render: (r) => <div><div className="font-semibold text-gray-800">{r.title}</div>{(r as any).zh_title && (r as any).zh_title !== r.title ? <div className="text-xs text-gray-400 mt-0.5">{(r as any).zh_title}</div> : null}</div> },
     { key: "g", header: "Tags", render: (r) => (
       <div className="flex gap-1.5 flex-wrap">{r.tags.map((t) => <span key={t} className="bg-gray-100 text-gray-500 px-2 py-0.5 rounded-lg text-xs font-medium">{t}</span>)}</div>
     ), className: "w-52" },
@@ -128,6 +128,7 @@ export default function AdminProjectsPage() {
           <div><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-[0.06em] mb-2">Demo URL</label><input value={form.demoUrl} onChange={(e) => setForm({ ...form, demoUrl: e.target.value })} className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/15 focus:border-blue-600 transition-all" /></div>
           <div><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-[0.06em] mb-2">Repo URL</label><input value={form.repoUrl} onChange={(e) => setForm({ ...form, repoUrl: e.target.value })} className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/15 focus:border-blue-600 transition-all" /></div>
           <div><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-[0.06em] mb-2">Video Hint</label><input value={form.videoHint} onChange={(e) => setForm({ ...form, videoHint: e.target.value })} className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/15 focus:border-blue-600 transition-all" /></div>
+          <div><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-[0.06em] mb-2">Time Period <span className="font-normal text-gray-400">(e.g. 2024, 2025-Present)</span></label><input value={form.timePeriod} onChange={(e) => setForm({ ...form, timePeriod: e.target.value })} placeholder="e.g. 2025-Present" className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/15 focus:border-blue-600 transition-all" /></div>
           <div className="flex justify-end pt-2"><button onClick={save} className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm shadow-blue-600/20">Save</button></div>
         </div>
       </AdminModal>
