@@ -25,9 +25,22 @@ export type ProjectSkill = {
   color: string;
 };
 
+export type UsedInRef = {
+  id: string;
+  title: string;
+  summary?: string;
+};
+
+export type UsedInExpRef = {
+  id: string;
+  year: string;
+  title: string;
+  description?: string;
+};
+
 export type UsedIn = {
-  projects: string[];
-  experiences: string[];
+  projects: UsedInRef[];
+  experiences: UsedInExpRef[];
 };
 
 export type SkillWithUsage = {

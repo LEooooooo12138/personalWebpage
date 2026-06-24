@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Language, messages } from "@/lib/i18n";
 import { useLanguage } from "@/components/language-provider";
-import { SkillsResponse, SkillWithUsage } from "@/types/portfolio";
+import { SkillsResponse, SkillWithUsage, UsedInRef, UsedInExpRef } from "@/types/portfolio";
 
 // ── Color mapping: DB color key → CSS variable ──
 const COLOR_VARS: Record<string, string> = {
@@ -186,35 +186,73 @@ export function SkillsPage({
                   {cat.description && (
                     <p className="skills-row-desc">{cat.description}</p>
                   )}
-                  {usageData && isOpen && (
-                    <div className="skills-usage-list">
-                      {(() => {
-                        const usageCat = usageData.categories.find((c) => c.id === cat.id);
-                        if (!usageCat) return null;
-                        return usageCat.skills.map((s) => {
-                          if (typeof s === "string") return null;
-                          const skillUsage = s as SkillWithUsage;
-                          return (
-                            <div key={skillUsage.name} className="skills-usage-row">
-                              <span className="skills-usage-name">{skillUsage.name}</span>
-                              <span className="skills-usage-info">
-                                {skillUsage.used_in.projects.length > 0 && (
-                                  <span title={skillUsage.used_in.projects.join(", ")}>
-                                    📦 {skillUsage.used_in.projects.length} project{skillUsage.used_in.projects.length > 1 ? "s" : ""}
-                                  </span>
-                                )}
-                                {skillUsage.used_in.experiences.length > 0 && (
-                                  <span title={skillUsage.used_in.experiences.join(", ")}>
-                                    {" · "}📋 {skillUsage.used_in.experiences.length} experience{skillUsage.used_in.experiences.length > 1 ? "s" : ""}
-                                  </span>
-                                )}
-                              </span>
+                  {usageData && isOpen && (() => {
+                    const usageCat = usageData.categories.find((c) => c.id === cat.id);
+                    if (!usageCat) return null;
+                    // Collect unique project and experience refs across all skills in this category
+                    const projMap = new Map<string, UsedInRef>();
+                    const expMap = new Map<string, UsedInExpRef>();
+                    for (const s of usageCat.skills) {
+                      if (typeof s === "string") continue;
+                      const skillUsage = s as SkillWithUsage;
+                      for (const p of skillUsage.used_in.projects) {
+                        if (!projMap.has(p.id)) projMap.set(p.id, p);
+                      }
+                      for (const e of skillUsage.used_in.experiences) {
+                        if (!expMap.has(e.id)) expMap.set(e.id, e);
+                      }
+                    }
+                    const projects = [...projMap.values()];
+                    const experiences = [...expMap.values()];
+                    const hasProjects = projects.length > 0;
+                    const hasExperiences = experiences.length > 0;
+                    if (!hasProjects && !hasExperiences) return null;
+
+                    return (
+                      <div className="skills-related">
+                        <div className="skills-related-divider" />
+                        <div className="skills-related-strip">
+                          <div className="skills-related-col">
+                            <div className="skills-related-col-header">
+                              <span className="skills-related-col-dot" style={{ background: "var(--gold)" }} />
+                              Projects
                             </div>
-                          );
-                        });
-                      })()}
-                    </div>
-                  )}
+                            {hasProjects ? (
+                              projects.map((p) => (
+                                <div key={p.id} className="skills-related-item">
+                                  <div className="skills-related-item-title">{p.title}</div>
+                                  {p.summary && (
+                                    <div className="skills-related-item-desc">{p.summary}</div>
+                                  )}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="skills-related-empty">No related projects yet</div>
+                            )}
+                          </div>
+                          <div className="skills-related-col-divider" />
+                          <div className="skills-related-col">
+                            <div className="skills-related-col-header">
+                              <span className="skills-related-col-dot" style={{ background: "var(--terracotta)" }} />
+                              Experience
+                            </div>
+                            {hasExperiences ? (
+                              experiences.map((e) => (
+                                <div key={e.id} className="skills-related-item">
+                                  <div className="skills-related-item-title">{e.year} · {e.title}</div>
+                                  {e.description && (
+                                    <div className="skills-related-item-desc">{e.description}</div>
+                                  )}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="skills-related-empty">No related experiences yet</div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             </div>

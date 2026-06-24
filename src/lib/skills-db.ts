@@ -209,30 +209,34 @@ export function updateLanguages(languages: LanguageRow[]): void {
 
 export function getSkillsWithUsage(lang: string): SkillsResponse {
   const base = getSkills(lang);
-
   const db = getPortfolioDb();
 
-  const projectUsage = db.prepare(`
-    SELECT ps.skill_name, ps.project_id
+  // Collect project refs (id, title, summary) per skill
+  const projectRows = db.prepare(`
+    SELECT DISTINCT ps.skill_name, p.id, p.title, p.summary
     FROM project_skills ps
-    ORDER BY ps.skill_name
-  `).all() as { skill_name: string; project_id: string }[];
+    JOIN projects p ON p.id = ps.project_id
+    ORDER BY ps.skill_name, p.id
+  `).all() as { skill_name: string; id: string; title: string; summary: string }[];
 
-  const experienceUsage = db.prepare(`
-    SELECT es.skill_name, es.experience_id
+  // Collect experience refs (id, year, title, description) per skill
+  const experienceRows = db.prepare(`
+    SELECT DISTINCT es.skill_name, e.id, e.year, e.title, e.description
     FROM experience_skills es
-    ORDER BY es.skill_name
-  `).all() as { skill_name: string; experience_id: string }[];
+    JOIN experiences e ON e.id = es.experience_id
+    ORDER BY es.skill_name, e.sort_order
+  `).all() as { skill_name: string; id: string; year: string; title: string; description: string }[];
 
-  const usageMap = new Map<string, { projects: Set<string>; experiences: Set<string> }>();
-
-  for (const row of projectUsage) {
-    if (!usageMap.has(row.skill_name)) usageMap.set(row.skill_name, { projects: new Set(), experiences: new Set() });
-    usageMap.get(row.skill_name)!.projects.add(row.project_id);
+  const projMap = new Map<string, { id: string; title: string; summary?: string }[]>();
+  for (const row of projectRows) {
+    if (!projMap.has(row.skill_name)) projMap.set(row.skill_name, []);
+    projMap.get(row.skill_name)!.push({ id: row.id, title: row.title, summary: row.summary });
   }
-  for (const row of experienceUsage) {
-    if (!usageMap.has(row.skill_name)) usageMap.set(row.skill_name, { projects: new Set(), experiences: new Set() });
-    usageMap.get(row.skill_name)!.experiences.add(row.experience_id);
+
+  const expMap = new Map<string, { id: string; year: string; title: string; description?: string }[]>();
+  for (const row of experienceRows) {
+    if (!expMap.has(row.skill_name)) expMap.set(row.skill_name, []);
+    expMap.get(row.skill_name)!.push({ id: row.id, year: row.year, title: row.title, description: row.description });
   }
 
   return {
@@ -241,12 +245,11 @@ export function getSkillsWithUsage(lang: string): SkillsResponse {
       ...cat,
       skills: cat.skills.map((s) => {
         const name = typeof s === "string" ? s : s.name;
-        const usage = usageMap.get(name);
         return {
           name,
           used_in: {
-            projects: usage ? [...usage.projects] : [],
-            experiences: usage ? [...usage.experiences] : [],
+            projects: projMap.get(name) || [],
+            experiences: expMap.get(name) || [],
           },
         };
       }),
