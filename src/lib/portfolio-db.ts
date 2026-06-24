@@ -96,19 +96,21 @@ function initSchema(db: Database.Database) {
     CREATE TABLE IF NOT EXISTS project_skills (
       project_id TEXT NOT NULL,
       skill_name TEXT NOT NULL,
+      category_id TEXT NOT NULL,
       sort_order INTEGER NOT NULL DEFAULT 0,
-      PRIMARY KEY (project_id, skill_name),
+      PRIMARY KEY (project_id, skill_name, category_id),
       FOREIGN KEY (project_id) REFERENCES projects(id),
-      FOREIGN KEY (skill_name) REFERENCES skills(name)
+      FOREIGN KEY (skill_name, category_id) REFERENCES skills(name, category_id)
     );
 
     CREATE TABLE IF NOT EXISTS experience_skills (
       experience_id TEXT NOT NULL,
       skill_name TEXT NOT NULL,
+      category_id TEXT NOT NULL,
       sort_order INTEGER NOT NULL DEFAULT 0,
-      PRIMARY KEY (experience_id, skill_name),
+      PRIMARY KEY (experience_id, skill_name, category_id),
       FOREIGN KEY (experience_id) REFERENCES experiences(id),
-      FOREIGN KEY (skill_name) REFERENCES skills(name)
+      FOREIGN KEY (skill_name, category_id) REFERENCES skills(name, category_id)
     );
 
     CREATE TABLE IF NOT EXISTS languages (
@@ -145,22 +147,24 @@ function migrateProjectTags(db: Database.Database) {
 
   const projects = db.prepare("SELECT id, tags FROM projects WHERE tags IS NOT NULL AND tags != '' AND tags != '[]'").all() as { id: string; tags: string }[];
   
-  const insertStmt = db.prepare("INSERT OR IGNORE INTO project_skills (project_id, skill_name, sort_order) VALUES (?, ?, ?)");
-  const skillExists = db.prepare("SELECT COUNT(*) as c FROM skills WHERE name = ?");
+  const insertStmt = db.prepare("INSERT OR IGNORE INTO project_skills (project_id, skill_name, category_id, sort_order) VALUES (?, ?, ?, ?)");
+  const catStmt = db.prepare("SELECT category_id FROM skills WHERE name = ? LIMIT 1");
   
   const tx = db.transaction(() => {
     for (const proj of projects) {
       try {
         const tags: string[] = JSON.parse(proj.tags);
         tags.forEach((tag, idx) => {
-          const exists = (skillExists.get(tag) as { c: number }).c;
-          if (exists > 0) {
-            insertStmt.run(proj.id, tag, idx);
+          const cat = catStmt.get(tag) as { category_id: string } | undefined;
+          if (cat) {
+            insertStmt.run(proj.id, tag, cat.category_id, idx);
           } else {
             console.warn(`[migration] Project "${proj.id}" tag "${tag}" not found in skills table — skipping`);
           }
         });
-      } catch { /* JSON parse failed — skip */ }
+      } catch {
+        console.warn(`[migration] Failed to parse tags JSON for project "${proj.id}" — skipping`);
+      }
     }
   });
   tx();
