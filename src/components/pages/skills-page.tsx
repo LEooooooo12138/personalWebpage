@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Language, messages } from "@/lib/i18n";
 import { useLanguage } from "@/components/language-provider";
-import { SkillsResponse } from "@/types/portfolio";
+import { SkillsResponse, SkillWithUsage } from "@/types/portfolio";
 
 // ── Color mapping: DB color key → CSS variable ──
 const COLOR_VARS: Record<string, string> = {
@@ -34,6 +34,15 @@ export function SkillsPage({
 
   // ── Accordion state ──
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [usageData, setUsageData] = useState<SkillsResponse | null>(null);
+
+  useEffect(() => {
+    if (!mounted) return;
+    fetch(`/api/skills?lang=${lang}&usage=1`)
+      .then((r) => r.json())
+      .then(setUsageData)
+      .catch(() => {});
+  }, [mounted, lang]);
 
 /*
   // ── Terminal mode ──
@@ -150,12 +159,15 @@ export function SkillsPage({
                 <span className="skills-row-dot" />
                 <span className="skills-row-title">{cat.title}</span>
                 <span className="skills-row-tags">
-                  {cat.skills.map((s, i) => (
-                    <span key={s}>
-                      {i > 0 && <span className="skills-tag-sep">·</span>}
-                      <span className="skills-tag">{s}</span>
-                    </span>
-                  ))}
+                  {cat.skills.map((s, i) => {
+                    const name = typeof s === "string" ? s : s.name;
+                    return (
+                      <span key={name}>
+                        {i > 0 && <span className="skills-tag-sep">·</span>}
+                        <span className="skills-tag">{name}</span>
+                      </span>
+                    );
+                  })}
                 </span>
                 <span className="skills-row-chevron">
                   {isOpen ? "▲" : "▶"}
@@ -173,6 +185,35 @@ export function SkillsPage({
                 <div className="skills-row-inner">
                   {cat.description && (
                     <p className="skills-row-desc">{cat.description}</p>
+                  )}
+                  {usageData && isOpen && (
+                    <div className="skills-usage-list">
+                      {(() => {
+                        const usageCat = usageData.categories.find((c) => c.id === cat.id);
+                        if (!usageCat) return null;
+                        return usageCat.skills.map((s) => {
+                          if (typeof s === "string") return null;
+                          const skillUsage = s as SkillWithUsage;
+                          return (
+                            <div key={skillUsage.name} className="skills-usage-row">
+                              <span className="skills-usage-name">{skillUsage.name}</span>
+                              <span className="skills-usage-info">
+                                {skillUsage.used_in.projects.length > 0 && (
+                                  <span title={skillUsage.used_in.projects.join(", ")}>
+                                    📦 {skillUsage.used_in.projects.length} project{skillUsage.used_in.projects.length > 1 ? "s" : ""}
+                                  </span>
+                                )}
+                                {skillUsage.used_in.experiences.length > 0 && (
+                                  <span title={skillUsage.used_in.experiences.join(", ")}>
+                                    {" · "}📋 {skillUsage.used_in.experiences.length} experience{skillUsage.used_in.experiences.length > 1 ? "s" : ""}
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
                   )}
                 </div>
               </div>
