@@ -1,150 +1,18 @@
 import Database from "better-sqlite3";
-import fs from "node:fs";
-import path from "node:path";
-import { SkillCategory, SkillsResponse } from "@/types/portfolio";
+import { getPortfolioDb } from "@/lib/portfolio-db";
+import { SkillCategory, SkillsResponse, SkillWithUsage, UsedIn } from "@/types/portfolio";
 
-// ── Color palette: cycles for new categories beyond the predefined 3 ──
 const COLOR_PALETTE = ["gold", "terracotta", "sage"] as const;
 
-declare global {
-  var __skillsDb: Database.Database | undefined;
-}
-
-const getDbPath = () => {
-  const dataDir = path.join(process.cwd(), "data");
-  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-  return path.join(dataDir, "skills.db");
-};
-
-const getDb = (): Database.Database => {
-  if (!globalThis.__skillsDb) {
-    const db = new Database(getDbPath());
-    db.pragma("journal_mode = WAL");
-    initTables(db);
-    seedDefaults(db);
-    globalThis.__skillsDb = db;
-  }
-  return globalThis.__skillsDb;
-};
-
-// ── Schema ──
-
-function initTables(db: Database.Database) {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS skill_categories (
-      id          TEXT PRIMARY KEY,
-      color       TEXT NOT NULL,
-      sort_order  INTEGER NOT NULL DEFAULT 0,
-      created_at  TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-
-    CREATE TABLE IF NOT EXISTS skill_category_i18n (
-      category_id TEXT NOT NULL,
-      lang        TEXT NOT NULL,
-      title       TEXT NOT NULL,
-      description TEXT NOT NULL DEFAULT '',
-      PRIMARY KEY (category_id, lang),
-      FOREIGN KEY (category_id) REFERENCES skill_categories(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS skills (
-      name        TEXT NOT NULL,
-      category_id TEXT NOT NULL,
-      proficiency INTEGER,
-      sort_order  INTEGER NOT NULL DEFAULT 0,
-      PRIMARY KEY (name, category_id),
-      FOREIGN KEY (category_id) REFERENCES skill_categories(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS languages (
-      lang TEXT NOT NULL,
-      name TEXT NOT NULL,
-      PRIMARY KEY (lang, name)
-    );
-  `);
-}
-
-// ── Seed ──
-
-function seedDefaults(db: Database.Database) {
-  const categoryCount = db.prepare("SELECT COUNT(*) as c FROM skill_categories").get() as { c: number };
-  if (categoryCount.c > 0) return;
-
-  const insertCategory = db.prepare(
-    "INSERT OR IGNORE INTO skill_categories (id, color, sort_order) VALUES (?, ?, ?)"
-  );
-  const insertI18n = db.prepare(
-    "INSERT OR IGNORE INTO skill_category_i18n (category_id, lang, title, description) VALUES (?, ?, ?, ?)"
-  );
-  const insertSkill = db.prepare(
-    "INSERT OR IGNORE INTO skills (name, category_id, proficiency, sort_order) VALUES (?, ?, ?, ?)"
-  );
-  const insertLanguage = db.prepare(
-    "INSERT OR IGNORE INTO languages (lang, name) VALUES (?, ?)"
-  );
-
-  const seed = db.transaction(() => {
-    // Categories
-    insertCategory.run("frontend", "gold", 0);
-    insertCategory.run("backend", "terracotta", 1);
-    insertCategory.run("tools", "sage", 2);
-    insertCategory.run("game", "gold", 3);
-
-    // i18n — en
-    insertI18n.run("frontend", "en", "Front-End", "Polished interfaces with thoughtful animation. Pixel‑perfect implementation that feels alive.");
-    insertI18n.run("backend", "en", "Back-End", "Robust APIs, database architecture, and server‑side systems. From SQL schema design to cloud deployment.");
-    insertI18n.run("tools", "en", "Tools & Workflow", "Git, cloud computing, and agile workflows — the foundational practices that make engineering teams ship.");
-    insertI18n.run("game", "en", "Game & 3D", "Real‑time engines and digital creation — where technical skill meets visual storytelling.");
-
-    // i18n — zh
-    insertI18n.run("frontend", "zh", "前端", "精致的界面与细腻的动效，像素级还原设计稿。");
-    insertI18n.run("backend", "zh", "后端", "稳健的 API、数据库架构与服务端系统。从 SQL 表设计到云端部署。");
-    insertI18n.run("tools", "zh", "工具与流程", "Git、云计算与敏捷开发——支撑工程团队交付的基础实践。");
-    insertI18n.run("game", "zh", "游戏与 3D", "实时引擎与数字创作——技术与视觉叙事的交汇点。");
-
-    // Skills
-    insertSkill.run("HTML", "frontend", 95, 0);
-    insertSkill.run("CSS", "frontend", 90, 1);
-    insertSkill.run("Vue", "frontend", 80, 2);
-    insertSkill.run("React", "frontend", 70, 3);
-
-    insertSkill.run("SQL", "backend", 90, 0);
-    insertSkill.run("C++", "backend", 75, 1);
-    insertSkill.run("Java", "backend", 80, 2);
-    insertSkill.run("Python", "backend", 85, 3);
-    insertSkill.run("Swift", "backend", 65, 4);
-    insertSkill.run("PHP", "backend", 60, 5);
-
-    insertSkill.run("Git", "tools", 85, 0);
-    insertSkill.run("Cloud Computing", "tools", 70, 1);
-    insertSkill.run("Agile Project Management", "tools", 80, 2);
-
-    insertSkill.run("UE5", "game", 40, 0);
-    insertSkill.run("Unity", "game", 45, 1);
-    insertSkill.run("Maya", "game", 35, 2);
-
-    // Languages
-    insertLanguage.run("en", "Mandarin (Native)");
-    insertLanguage.run("en", "English (Professional)");
-    insertLanguage.run("zh", "中文（母语）");
-    insertLanguage.run("zh", "英文（专业工作能力）");
-  });
-
-  seed();
-}
-
-// ── Color assignment for dynamic categories ──
-
-function assignColor(db: Database.Database, categoryId: string): string {
+function assignColor(db: Database.Database): string {
   const count = (db.prepare("SELECT COUNT(*) as c FROM skill_categories").get() as { c: number }).c;
   return COLOR_PALETTE[(count - 1) % COLOR_PALETTE.length];
 }
 
-// ── Query ──
+// ── Public read ──
 
 export function getSkills(lang: string): SkillsResponse {
-  const db = getDb();
+  const db = getPortfolioDb();
 
   const categoryRows = db
     .prepare(
@@ -155,7 +23,6 @@ export function getSkills(lang: string): SkillsResponse {
     )
     .all(lang) as { id: string; color: string; title: string; description: string }[];
 
-  // Fallback to en if requested lang has no rows
   const rows = categoryRows.length > 0
     ? categoryRows
     : (db
@@ -173,13 +40,7 @@ export function getSkills(lang: string): SkillsResponse {
 
   const categories: SkillCategory[] = rows.map((row) => {
     const skills = (getSkillsForCategory.all(row.id) as { name: string }[]).map((s) => s.name);
-    return {
-      id: row.id,
-      color: row.color,
-      title: row.title,
-      description: row.description,
-      skills,
-    };
+    return { id: row.id, color: row.color, title: row.title, description: row.description, skills };
   });
 
   const langRows = db
@@ -193,20 +54,40 @@ export function getSkills(lang: string): SkillsResponse {
   return { categories, languages };
 }
 
-// ── Mutations (for future admin use) ──
+// ── Admin: Categories ──
 
-export function addSkill(categoryId: string, name: string, proficiency?: number) {
-  const db = getDb();
-  const maxSort = db.prepare("SELECT MAX(sort_order) as m FROM skills WHERE category_id = ?").get(categoryId) as { m: number | null };
-  const sortOrder = (maxSort?.m ?? -1) + 1;
-  db.prepare("INSERT OR IGNORE INTO skills (name, category_id, proficiency, sort_order) VALUES (?, ?, ?, ?)").run(name, categoryId, proficiency ?? null, sortOrder);
+export type CategoryRow = {
+  id: string;
+  color: string;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+  en_title: string;
+  en_description: string;
+  zh_title: string;
+  zh_description: string;
+};
+
+export function getCategories(): CategoryRow[] {
+  const db = getPortfolioDb();
+  return db.prepare(`
+    SELECT sc.*,
+      COALESCE(en.title, '') as en_title, COALESCE(en.description, '') as en_description,
+      COALESCE(zh.title, '') as zh_title, COALESCE(zh.description, '') as zh_description
+    FROM skill_categories sc
+    LEFT JOIN skill_category_i18n en ON en.category_id = sc.id AND en.lang = 'en'
+    LEFT JOIN skill_category_i18n zh ON zh.category_id = sc.id AND zh.lang = 'zh'
+    ORDER BY sc.sort_order ASC
+  `).all() as CategoryRow[];
 }
 
-export function addCategory(id: string, enTitle: string, zhTitle: string, enDesc: string, zhDesc: string) {
-  const db = getDb();
-  const color = assignColor(db, id);
-  const maxSort = db.prepare("SELECT MAX(sort_order) as m FROM skill_categories").get() as { m: number | null };
-  const sortOrder = (maxSort?.m ?? -1) + 1;
+export function createCategory(
+  id: string, enTitle: string, zhTitle: string, enDesc: string, zhDesc: string,
+): void {
+  const db = getPortfolioDb();
+  const color = assignColor(db);
+  const maxSort = (db.prepare("SELECT MAX(sort_order) as m FROM skill_categories").get() as { m: number | null }).m ?? -1;
+  const sortOrder = maxSort + 1;
 
   const tx = db.transaction(() => {
     db.prepare("INSERT OR IGNORE INTO skill_categories (id, color, sort_order) VALUES (?, ?, ?)").run(id, color, sortOrder);
@@ -214,4 +95,161 @@ export function addCategory(id: string, enTitle: string, zhTitle: string, enDesc
     db.prepare("INSERT OR IGNORE INTO skill_category_i18n (category_id, lang, title, description) VALUES (?, 'zh', ?, ?)").run(id, zhTitle, zhDesc);
   });
   tx();
+}
+
+export function updateCategory(
+  id: string, color: string, sortOrder: number,
+  enTitle: string, zhTitle: string, enDesc: string, zhDesc: string,
+): void {
+  const db = getPortfolioDb();
+  const tx = db.transaction(() => {
+    db.prepare("UPDATE skill_categories SET color = ?, sort_order = ?, updated_at = datetime('now') WHERE id = ?").run(color, sortOrder, id);
+    db.prepare("INSERT OR REPLACE INTO skill_category_i18n (category_id, lang, title, description) VALUES (?, 'en', ?, ?)").run(id, enTitle, enDesc);
+    db.prepare("INSERT OR REPLACE INTO skill_category_i18n (category_id, lang, title, description) VALUES (?, 'zh', ?, ?)").run(id, zhTitle, zhDesc);
+  });
+  tx();
+}
+
+export function deleteCategory(id: string): void {
+  const db = getPortfolioDb();
+  const tx = db.transaction(() => {
+    db.prepare("DELETE FROM skills WHERE category_id = ?").run(id);
+    db.prepare("DELETE FROM skill_category_i18n WHERE category_id = ?").run(id);
+    db.prepare("DELETE FROM skill_categories WHERE id = ?").run(id);
+  });
+  tx();
+}
+
+// ── Admin: Skills ──
+
+export type SkillRow = {
+  name: string;
+  category_id: string;
+  proficiency: number | null;
+  sort_order: number;
+};
+
+export function getSkillsByCategory(categoryId: string): SkillRow[] {
+  const db = getPortfolioDb();
+  return db.prepare("SELECT * FROM skills WHERE category_id = ? ORDER BY sort_order ASC").all(categoryId) as SkillRow[];
+}
+
+export function addSkill(categoryId: string, name: string, proficiency?: number): void {
+  const db = getPortfolioDb();
+  const maxSort = (db.prepare("SELECT MAX(sort_order) as m FROM skills WHERE category_id = ?").get(categoryId) as { m: number | null }).m ?? -1;
+  db.prepare("INSERT OR IGNORE INTO skills (name, category_id, proficiency, sort_order) VALUES (?, ?, ?, ?)").run(name, categoryId, proficiency ?? null, maxSort + 1);
+}
+
+export function updateSkill(name: string, newName: string, categoryId: string, proficiency: number | null): void {
+  const db = getPortfolioDb();
+  if (name !== newName) {
+    // Need to insert new, delete old since name is part of PK
+    const tx = db.transaction(() => {
+      const oldSort = (db.prepare("SELECT sort_order FROM skills WHERE name = ? AND category_id = ?").get(name, categoryId) as { sort_order: number } | undefined);
+      db.prepare("DELETE FROM skills WHERE name = ? AND category_id = ?").run(name, categoryId);
+      db.prepare("INSERT OR IGNORE INTO skills (name, category_id, proficiency, sort_order) VALUES (?, ?, ?, ?)").run(
+        newName, categoryId, proficiency, oldSort?.sort_order ?? 0,
+      );
+    });
+    tx();
+  } else {
+    db.prepare("UPDATE skills SET proficiency = ?, category_id = ? WHERE name = ? AND category_id = ?").run(proficiency, categoryId, name, categoryId);
+  }
+}
+
+export function deleteSkill(name: string, categoryId: string): void {
+  const db = getPortfolioDb();
+  db.prepare("DELETE FROM skills WHERE name = ? AND category_id = ?").run(name, categoryId);
+}
+
+// ── Admin: Reorder ──
+
+export type ReorderItem = { id: string; sort_order: number };
+
+export function reorderSkillsOrCategories(type: "skill" | "category", items: ReorderItem[]): void {
+  const db = getPortfolioDb();
+  const tx = db.transaction(() => {
+    if (type === "skill") {
+      const stmt = db.prepare("UPDATE skills SET sort_order = ? WHERE name = ?");
+      for (const item of items) {
+        stmt.run(item.sort_order, item.id);
+      }
+    } else {
+      const stmt = db.prepare("UPDATE skill_categories SET sort_order = ?, updated_at = datetime('now') WHERE id = ?");
+      for (const item of items) {
+        stmt.run(item.sort_order, item.id);
+      }
+    }
+  });
+  tx();
+}
+
+// ── Admin: Languages ──
+
+export type LanguageRow = { lang: string; name: string };
+
+export function getLanguages(): LanguageRow[] {
+  const db = getPortfolioDb();
+  return db.prepare("SELECT * FROM languages ORDER BY lang, name").all() as LanguageRow[];
+}
+
+export function updateLanguages(languages: LanguageRow[]): void {
+  const db = getPortfolioDb();
+  const tx = db.transaction(() => {
+    db.prepare("DELETE FROM languages").run();
+    const stmt = db.prepare("INSERT INTO languages (lang, name) VALUES (?, ?)");
+    for (const l of languages) {
+      stmt.run(l.lang, l.name);
+    }
+  });
+  tx();
+}
+
+// ── Public: Skills with reverse lookup ──
+
+export function getSkillsWithUsage(lang: string): SkillsResponse {
+  const base = getSkills(lang);
+
+  const db = getPortfolioDb();
+
+  const projectUsage = db.prepare(`
+    SELECT ps.skill_name, ps.project_id
+    FROM project_skills ps
+    ORDER BY ps.skill_name
+  `).all() as { skill_name: string; project_id: string }[];
+
+  const experienceUsage = db.prepare(`
+    SELECT es.skill_name, es.experience_id
+    FROM experience_skills es
+    ORDER BY es.skill_name
+  `).all() as { skill_name: string; experience_id: string }[];
+
+  const usageMap = new Map<string, { projects: Set<string>; experiences: Set<string> }>();
+
+  for (const row of projectUsage) {
+    if (!usageMap.has(row.skill_name)) usageMap.set(row.skill_name, { projects: new Set(), experiences: new Set() });
+    usageMap.get(row.skill_name)!.projects.add(row.project_id);
+  }
+  for (const row of experienceUsage) {
+    if (!usageMap.has(row.skill_name)) usageMap.set(row.skill_name, { projects: new Set(), experiences: new Set() });
+    usageMap.get(row.skill_name)!.experiences.add(row.experience_id);
+  }
+
+  return {
+    languages: base.languages,
+    categories: base.categories.map((cat) => ({
+      ...cat,
+      skills: cat.skills.map((s) => {
+        const name = typeof s === "string" ? s : s.name;
+        const usage = usageMap.get(name);
+        return {
+          name,
+          used_in: {
+            projects: usage ? [...usage.projects] : [],
+            experiences: usage ? [...usage.experiences] : [],
+          },
+        };
+      }),
+    })),
+  };
 }
