@@ -7,7 +7,8 @@ export async function GET(request: Request) {
   const lang = (searchParams.get("lang") || "en") as "en" | "zh";
 
   try {
-    const experiences = getExperiencesWithNarratives();
+    // DB now handles i18n via experience_i18n table
+    const experiences = getExperiencesWithNarratives(lang);
     const narratives = lang === "zh" ? narrativeZh : narrativeEn;
     const narMap = new Map(narratives.map((n) => [n.year, n]));
 
