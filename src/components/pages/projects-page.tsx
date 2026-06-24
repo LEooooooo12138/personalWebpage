@@ -41,7 +41,7 @@ export function ProjectsPage({ serverLang }: { serverLang: Language }) {
     <section className="projects-page" id="projects">
       <div className="proj-header reveal" data-reveal>
         <h2>{m.projects.title}</h2>
-        <p>{lang === "zh" ? "想法在变，手感在变，每个项目都藏着一个思考的岔路口。" : "Ideas evolve, touch changes — every project hides a fork in thought."}</p>
+        <p>{m.projects.subtitle}</p>
       </div>
 
       <div className="proj-list reveal-stagger" data-reveal>

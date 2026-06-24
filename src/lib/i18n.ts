@@ -27,7 +27,7 @@ export const messages = {
         "Currently working at AI Negotiate Co., Ltd.",
       ],
       tagline:
-        "A clean and friendly portfolio that highlights my work, background, and collaboration style.",
+        "Full-Stack Developer & Product Builder — from Melbourne to Hangzhou.",
       availability: "Current Status",
       focus: "Current Focus",
       response: "Reply Speed",
@@ -62,7 +62,7 @@ export const messages = {
     experience: {
       title: "Experience & Education Timeline",
       subtitle:
-        "This section keeps the full history from the previous version and adds current updates.",
+        "A decade of learning, building, and crossing continents.",
       items: [
         {
           year: "2018",
@@ -124,6 +124,7 @@ export const messages = {
     },
     projects: {
       title: "Project Gallery",
+      subtitle: "A curated look at the work I've built — from AI vision to full-stack apps.",
       claps: "Total claps",
       live: "Live",
       repo: "Repo",
@@ -188,7 +189,7 @@ export const messages = {
         "全栈开发者 + 产品构建者。",
         "目前就职于智慧沟通有限公司。",
       ],
-      tagline: "一个更简洁、友好的个人主页，用来清楚展示我的能力、经历与合作方式。",
+      tagline: "全栈开发者 & 产品构建者 — 从墨尔本到杭州。",
       availability: "当前状态",
       focus: "正在做什么",
       response: "回复速度",
@@ -214,7 +215,7 @@ export const messages = {
     },
     experience: {
       title: "经历与教育时间线",
-      subtitle: "这里完整保留了旧版本的重要经历，并加入了最新状态更新。",
+      subtitle: "跨越十年的学习、构建与成长之旅。",
       items: [
         {
           year: "2018",
@@ -276,6 +277,7 @@ export const messages = {
     },
     projects: {
       title: "项目展示",
+      subtitle: "精选项目一览 — 从 AI 视觉到全栈应用。",
       claps: "累计点赞",
       live: "预览",
       repo: "仓库",
