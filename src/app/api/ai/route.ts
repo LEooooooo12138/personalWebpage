@@ -1,5 +1,7 @@
-import { getProfile } from "@/lib/profile-db";
+import * as staticData from "@/lib/data-static";
 import { NextResponse } from "next/server";
+
+const isProd = process.env.NODE_ENV === "production";
 
 type AskPayload = {
   question?: string;
@@ -41,6 +43,12 @@ const answerByKeyword = (question: string, lang: "en" | "zh", profile: Record<st
     : "Yuanle focuses on full-stack product delivery with strong adaptability, and is open to engineering collaboration.";
 };
 
+async function getProfileData(): Promise<Record<string, string>> {
+  if (isProd) return staticData.getProfile();
+  const { getProfile } = await import("@/lib/profile-db");
+  return getProfile();
+}
+
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as AskPayload;
   const question = (body.question ?? "").trim();
@@ -53,7 +61,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const profile = getProfile();
+  const profile = await getProfileData();
 
   return NextResponse.json({
     answer: answerByKeyword(question, lang, profile),

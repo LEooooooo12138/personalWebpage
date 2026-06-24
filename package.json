@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run export-data && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "export-data": "npx tsx scripts/export-data.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

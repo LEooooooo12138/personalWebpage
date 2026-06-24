@@ -1,0 +1,61 @@
+{
+  "categories": [
+    {
+      "id": "frontend",
+      "color": "gold",
+      "title": "Front-End",
+      "description": "Polished interfaces with thoughtful animation. Pixel‑perfect implementation that feels alive.",
+      "skills": [
+        "HTML",
+        "CSS",
+        "Vue",
+        "React",
+        "TypeScript",
+        "Next.js",
+        "Tailwind"
+      ]
+    },
+    {
+      "id": "backend",
+      "color": "terracotta",
+      "title": "Back-End",
+      "description": "Robust APIs, database architecture, and server‑side systems. From SQL schema design to cloud deployment.",
+      "skills": [
+        "SQL",
+        "C++",
+        "Java",
+        "Python",
+        "Swift",
+        "PHP",
+        "Computer Vision"
+      ]
+    },
+    {
+      "id": "tools",
+      "color": "sage",
+      "title": "Tools & Workflow",
+      "description": "Git, cloud computing, and agile workflows — the foundational practices that make engineering teams ship.",
+      "skills": [
+        "Git",
+        "Cloud Computing",
+        "Agile Project Management",
+        "Figma"
+      ]
+    },
+    {
+      "id": "game",
+      "color": "gold",
+      "title": "Game & 3D",
+      "description": "Real‑time engines and digital creation — where technical skill meets visual storytelling.",
+      "skills": [
+        "UE5",
+        "Unity",
+        "Maya"
+      ]
+    }
+  ],
+  "languages": [
+    "English (Professional)",
+    "Mandarin (Native)"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "categories": [
+    {
+      "id": "frontend",
+      "color": "gold",
+      "title": "前端",
+      "description": "精致的界面与细腻的动效，像素级还原设计稿。",
+      "skills": [
+        "HTML",
+        "CSS",
+        "Vue",
+        "React",
+        "TypeScript",
+        "Next.js",
+        "Tailwind"
+      ]
+    },
+    {
+      "id": "backend",
+      "color": "terracotta",
+      "title": "后端",
+      "description": "稳健的 API、数据库架构与服务端系统。从 SQL 表设计到云端部署。",
+      "skills": [
+        "SQL",
+        "C++",
+        "Java",
+        "Python",
+        "Swift",
+        "PHP",
+        "Computer Vision"
+      ]
+    },
+    {
+      "id": "tools",
+      "color": "sage",
+      "title": "工具与流程",
+      "description": "Git、云计算与敏捷开发——支撑工程团队交付的基础实践。",
+      "skills": [
+        "Git",
+        "Cloud Computing",
+        "Agile Project Management",
+        "Figma"
+      ]
+    },
+    {
+      "id": "game",
+      "color": "gold",
+      "title": "游戏与 3D",
+      "description": "实时引擎与数字创作——技术与视觉叙事的交汇点。",
+      "skills": [
+        "UE5",
+        "Unity",
+        "Maya"
+      ]
+    }
+  ],
+  "languages": [
+    "中文（母语）",
+    "英文（专业工作能力）"
+  ]
+}

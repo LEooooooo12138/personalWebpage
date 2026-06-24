@@ -1,0 +1,84 @@
+[
+  {
+    "id": "personal-web-v3",
+    "title": "Personal Web V3",
+    "summary": "A dynamic portfolio platform with interactive Bento layout, AI assistant, and visitor feedback loop.",
+    "tags": [
+      "Next.js",
+      "Tailwind",
+      "Framer Motion",
+      "API"
+    ],
+    "demoUrl": "",
+    "repoUrl": "",
+    "videoHint": "Hover to preview: Bento UI transitions + realtime counters",
+    "claps": 0,
+    "timePeriod": "2025-Present",
+    "skills": [
+      {
+        "name": "React",
+        "category": "Front-End",
+        "color": "gold"
+      },
+      {
+        "name": "TypeScript",
+        "category": "Front-End",
+        "color": "gold"
+      },
+      {
+        "name": "SQL",
+        "category": "Back-End",
+        "color": "terracotta"
+      }
+    ]
+  },
+  {
+    "id": "smart-energy",
+    "title": "Smart Energy Manager",
+    "summary": "An energy-control concept for smart homes focused on visibility and predictive usage insights.",
+    "tags": [
+      "Java",
+      "SQL",
+      "Cloud"
+    ],
+    "demoUrl": "",
+    "repoUrl": "",
+    "videoHint": "Hover to preview: usage dashboard and scenario simulation",
+    "claps": 0,
+    "timePeriod": "2024",
+    "skills": [
+      {
+        "name": "Figma",
+        "category": "Tools & Workflow",
+        "color": "sage"
+      }
+    ]
+  },
+  {
+    "id": "yolov5-detection",
+    "title": "YOLOv5 Detection Toolkit",
+    "summary": "Image and stream detection flow with planned custom-weight tuning and result visualization.",
+    "tags": [
+      "Python",
+      "YOLOv5",
+      "Computer Vision"
+    ],
+    "demoUrl": "",
+    "repoUrl": "",
+    "videoHint": "Hover to preview: frame-by-frame detection overlays",
+    "claps": 0,
+    "timePeriod": "2025",
+    "skills": [
+      {
+        "name": "Python",
+        "category": "Back-End",
+        "color": "terracotta"
+      },
+      {
+        "name": "Vue",
+        "category": "Front-End",
+        "color": "gold"
+      }
+    ]
+  }
+]

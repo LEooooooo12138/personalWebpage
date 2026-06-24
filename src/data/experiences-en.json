@@ -1,0 +1,140 @@
+[
+  {
+    "id": "5360363e-1aa1-4706-b97d-54c0aacb2bdc",
+    "year": "2018",
+    "title": "Study Abroad Start - Trinity College, Melbourne",
+    "description": "I arrived in Melbourne and began my study abroad life at Trinity College. In a new environment, I learned independent living, made new friends, and adapted to a different learning style.",
+    "note": "Keyword: adaptation and self-management",
+    "skills": []
+  },
+  {
+    "id": "70663fb9-1aae-4d1f-9789-f918e51b40b5",
+    "year": "2019",
+    "title": "Monash University - Bachelor of Information Technology",
+    "description": "I entered Monash University and started systematic software development learning. Coursework demanded strong self-learning and time management, which strengthened my engineering foundation.",
+    "note": "Keyword: software fundamentals and autonomy",
+    "skills": []
+  },
+  {
+    "id": "074b8e66-81fa-4d3a-b735-c31f82da1a5f",
+    "year": "2020-2021",
+    "title": "Online Study During Pandemic",
+    "description": "During the pandemic, I continued online study from China. Although communication was harder, this period improved my consistency and focus on academic progress.",
+    "note": "Keyword: resilience and consistency",
+    "skills": []
+  },
+  {
+    "id": "16b11c03-c726-4f9a-85f1-d377aa4ca045",
+    "year": "2022",
+    "title": "Campus Return and Graduation Stage",
+    "description": "After returning to campus, I balanced graduation project pressure and team collaboration, improving my delivery capability under constraints.",
+    "note": "Keyword: delivery under pressure",
+    "skills": []
+  },
+  {
+    "id": "d7027326-dc31-45d3-9d8a-f4526b23f98d",
+    "year": "2023",
+    "title": "UTS Master Program - Software Development",
+    "description": "I moved from Melbourne to Sydney and began my master studies at UTS. New city context expanded my adaptability and product perspective.",
+    "note": "Keyword: advanced study and cross-city transition",
+    "skills": [
+      {
+        "name": "Java",
+        "category": "Back-End",
+        "color": "terracotta"
+      },
+      {
+        "name": "Python",
+        "category": "Back-End",
+        "color": "terracotta"
+      },
+      {
+        "name": "SQL",
+        "category": "Back-End",
+        "color": "terracotta"
+      }
+    ]
+  },
+  {
+    "id": "5f523865-8f8d-4d35-a457-d9f5c8ea14f0",
+    "year": "2024",
+    "title": "Internship + Personal Website Iteration",
+    "description": "While studying, I also worked on internship tasks and continued improving my personal website, integrating frontend, backend, and UX into one workflow.",
+    "note": "Keyword: full-stack practice",
+    "skills": [
+      {
+        "name": "React",
+        "category": "Front-End",
+        "color": "gold"
+      },
+      {
+        "name": "Vue",
+        "category": "Front-End",
+        "color": "gold"
+      },
+      {
+        "name": "Git",
+        "category": "Tools & Workflow",
+        "color": "sage"
+      },
+      {
+        "name": "Figma",
+        "category": "Tools & Workflow",
+        "color": "sage"
+      }
+    ]
+  },
+  {
+    "id": "7b2511fe-c7c9-4fa2-ad61-7054ae2e383f",
+    "year": "2025",
+    "title": "Research Assistant - Zhejiang University",
+    "description": "Served as a research assistant at Zhejiang University, focusing on AI-vision related projects, model experimentation, and practical implementation support.",
+    "note": "Keyword: AI vision research",
+    "skills": [
+      {
+        "name": "Python",
+        "category": "Back-End",
+        "color": "terracotta"
+      },
+      {
+        "name": "Computer Vision",
+        "category": "Back-End",
+        "color": "terracotta"
+      },
+      {
+        "name": "Vue",
+        "category": "Front-End",
+        "color": "gold"
+      }
+    ]
+  },
+  {
+    "id": "fd17ffdd-347c-4827-a7d7-ceae44dfb720",
+    "year": "2026",
+    "title": "Software Engineer - AI Negotiate Co., Ltd.",
+    "description": "Currently working at AI Negotiate Co., Ltd., participating in product development and technical implementation while continuing the V3 portfolio build.",
+    "note": "Keyword: current role and product engineering",
+    "skills": [
+      {
+        "name": "React",
+        "category": "Front-End",
+        "color": "gold"
+      },
+      {
+        "name": "TypeScript",
+        "category": "Front-End",
+        "color": "gold"
+      },
+      {
+        "name": "Next.js",
+        "category": "Front-End",
+        "color": "gold"
+      },
+      {
+        "name": "SQL",
+        "category": "Back-End",
+        "color": "terracotta"
+      }
+    ]
+  }
+]

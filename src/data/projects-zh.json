@@ -1,0 +1,84 @@
+[
+  {
+    "id": "personal-web-v3",
+    "title": "个人主页",
+    "summary": "这是我的个人主页，基于 VUE 架构构建。我相信这个网站可以帮助你更好地了解我。",
+    "tags": [
+      "Next.js",
+      "Tailwind",
+      "Framer Motion",
+      "API"
+    ],
+    "demoUrl": "",
+    "repoUrl": "",
+    "videoHint": "链接：暂未发布",
+    "claps": 0,
+    "timePeriod": "2025-Present",
+    "skills": [
+      {
+        "name": "React",
+        "category": "前端",
+        "color": "gold"
+      },
+      {
+        "name": "TypeScript",
+        "category": "前端",
+        "color": "gold"
+      },
+      {
+        "name": "SQL",
+        "category": "后端",
+        "color": "terracotta"
+      }
+    ]
+  },
+  {
+    "id": "smart-energy",
+    "title": "智能用电管理",
+    "summary": "该项目致力于打造更可控的智能家居用电系统，未来将结合 AI 帮助用户更直观地了解自发电收益与支出。",
+    "tags": [
+      "Java",
+      "SQL",
+      "Cloud"
+    ],
+    "demoUrl": "",
+    "repoUrl": "",
+    "videoHint": "链接：暂未发布",
+    "claps": 0,
+    "timePeriod": "2024",
+    "skills": [
+      {
+        "name": "Figma",
+        "category": "工具与流程",
+        "color": "sage"
+      }
+    ]
+  },
+  {
+    "id": "yolov5-detection",
+    "title": "基于 YOLOv5 的图像检测",
+    "summary": "该项目用于实时图像或视频流检测，当前可检测上传图像，后续将支持权重参数调节和视频流检测。",
+    "tags": [
+      "Python",
+      "YOLOv5",
+      "Computer Vision"
+    ],
+    "demoUrl": "",
+    "repoUrl": "",
+    "videoHint": "链接：未完成",
+    "claps": 0,
+    "timePeriod": "2025",
+    "skills": [
+      {
+        "name": "Python",
+        "category": "后端",
+        "color": "terracotta"
+      },
+      {
+        "name": "Vue",
+        "category": "前端",
+        "color": "gold"
+      }
+    ]
+  }
+]
