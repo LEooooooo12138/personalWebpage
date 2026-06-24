@@ -75,6 +75,7 @@ export function ProjectsPage({ serverLang }: { serverLang: Language }) {
                       name={skill.name}
                       color={skill.color}
                       size="sm"
+                      category={skill.category || undefined}
                     />
                   ))}
                   <span className="hint">{videoHint}</span>

@@ -150,7 +150,7 @@ export function ExperiencePage({ serverLang }: { serverLang: Language }) {
                   {expSkills.has(item.year) && expSkills.get(item.year)!.length > 0 && (
                     <div className="exp-tech-tags">
                       {expSkills.get(item.year)!.map((s) => (
-                        <SkillTag key={s.name} name={s.name} color={s.color} size="sm" />
+                        <SkillTag key={s.name} name={s.name} color={s.color} size="sm" category={s.category || undefined} />
                       ))}
                     </div>
                   )}

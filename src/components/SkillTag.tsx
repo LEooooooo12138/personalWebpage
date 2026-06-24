@@ -8,17 +8,27 @@ const COLOR_VARS: Record<string, string> = {
   sage: "var(--sage)",
 };
 
+const COLOR_LIGHT: Record<string, string> = {
+  gold: "var(--gold-light)",
+  terracotta: "var(--terracotta-light)",
+  sage: "var(--sage-light)",
+};
+
 export function SkillTag({
   name,
   color = "gold",
   size = "md",
+  category,
 }: {
   name: string;
   color?: string;
   size?: "sm" | "md";
+  category?: string;
 }) {
   const [hovered, setHovered] = useState(false);
+  const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
   const [popupStyle, setPopupStyle] = useState<React.CSSProperties>({});
 
   useEffect(() => {
@@ -26,45 +36,53 @@ export function SkillTag({
       const rect = ref.current.getBoundingClientRect();
       setPopupStyle({
         position: "fixed",
-        top: rect.bottom + 6,
-        left: rect.left,
-        zIndex: 50,
+        top: rect.bottom + 8,
+        left: Math.max(8, rect.left),
+        zIndex: 100,
       });
+      // Delay visibility for fade-in
+      const t = setTimeout(() => setVisible(true), 20);
+      return () => clearTimeout(t);
+    } else {
+      setVisible(false);
     }
   }, [hovered]);
 
   const accent = COLOR_VARS[color] || COLOR_VARS.gold;
-  const sizeClass = size === "sm" ? "text-[11px] px-2 py-0.5" : "text-xs px-2.5 py-1";
+  const lightAccent = COLOR_LIGHT[color] || COLOR_LIGHT.gold;
+  const sizeClass =
+    size === "sm"
+      ? "text-[11px] px-2 py-0.5"
+      : "text-xs px-2.5 py-1";
 
   return (
     <>
       <span
         ref={ref}
-        className={`skill-tag-inline inline-flex items-center gap-1 rounded-md font-medium cursor-default transition-colors ${sizeClass}`}
+        className={`skill-tag-inline ${sizeClass}`}
         style={{
-          background: `${accent}18`,
+          background: lightAccent,
           color: accent,
           border: `1px solid ${accent}33`,
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <span
-          className="skill-dot rounded-full"
-          style={{
-            width: 6,
-            height: 6,
-            background: accent,
-          }}
-        />
+        <span className="skill-tag-dot" style={{ background: accent }} />
         {name}
       </span>
       {hovered && (
         <div
+          ref={popupRef}
           style={popupStyle}
-          className="skill-tag-popup bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-zinc-300 shadow-xl"
+          className={`skill-tag-popup ${visible ? "skill-tag-popup--visible" : ""}`}
         >
-          <span style={{ color: accent }} className="font-semibold">{name}</span>
+          <div className="skill-tag-popup-name" style={{ color: accent }}>
+            {name}
+          </div>
+          {category && (
+            <div className="skill-tag-popup-cat">{category}</div>
+          )}
         </div>
       )}
     </>

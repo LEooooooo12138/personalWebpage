@@ -178,7 +178,7 @@ export function SkillsPage({
               <div
                 className="skills-row-body"
                 style={{
-                  maxHeight: isOpen ? "600px" : "0px",
+                  maxHeight: isOpen ? "1000px" : "0px",
                   opacity: isOpen ? 1 : 0,
                 }}
               >

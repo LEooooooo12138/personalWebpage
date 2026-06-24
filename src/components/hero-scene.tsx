@@ -110,7 +110,7 @@ function ParticleRing({ radius, count, color, tilt, speed, size }: RingConfig) {
         />
       </bufferGeometry>
       <pointsMaterial
-        map={texture}
+        map={texture as any}
         color={color}
         size={size}
         sizeAttenuation

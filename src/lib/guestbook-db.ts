@@ -1,6 +1,7 @@
 import { list, put } from "@vercel/blob";
 import { GuestNote } from "@/types/portfolio";
-import { getSingletonDb, shouldUseBlob } from "@/lib/db-factory";
+import { getPortfolioDb } from "@/lib/portfolio-db";
+import { shouldUseBlob } from "@/lib/db-factory";
 
 type GuestbookRow = {
   id: string;
@@ -11,18 +12,7 @@ type GuestbookRow = {
 
 const BLOB_PREFIX = "guestbook/notes/";
 
-const SCHEMA_SQL = `
-  CREATE TABLE IF NOT EXISTS guestbook_notes (
-    id TEXT PRIMARY KEY,
-    author TEXT NOT NULL,
-    message TEXT NOT NULL,
-    created_at TEXT NOT NULL
-  );
-  CREATE INDEX IF NOT EXISTS idx_guestbook_created_at
-  ON guestbook_notes(created_at DESC);
-`;
-
-/* ── Blob 后端 ── */
+/* ── Blob backend ── */
 
 const listFromBlob = async (): Promise<GuestNote[]> => {
   const notes: GuestNote[] = [];
@@ -65,10 +55,10 @@ const insertToBlob = async (note: GuestNote) => {
   });
 };
 
-/* ── SQLite 后端 ── */
+/* ── SQLite backend ── */
 
 const listFromSqlite = (): GuestNote[] => {
-  const db = getSingletonDb("guestbook", SCHEMA_SQL);
+  const db = getPortfolioDb();
   const rows = db
     .prepare(
       "SELECT id, author, message, created_at FROM guestbook_notes ORDER BY created_at DESC LIMIT 500",
@@ -84,18 +74,16 @@ const listFromSqlite = (): GuestNote[] => {
 };
 
 const insertToSqlite = (note: GuestNote) => {
-  const db = getSingletonDb("guestbook", SCHEMA_SQL);
+  const db = getPortfolioDb();
   db.prepare(
     "INSERT INTO guestbook_notes (id, author, message, created_at) VALUES (?, ?, ?, ?)",
   ).run(note.id, note.author, note.message, note.createdAt);
 };
 
-/* ── 对外接口 ── */
+/* ── Public API ── */
 
 export const listGuestbookNotes = async (): Promise<GuestNote[]> => {
-  if (shouldUseBlob()) {
-    return listFromBlob();
-  }
+  if (shouldUseBlob()) return listFromBlob();
   return listFromSqlite();
 };
 
@@ -104,7 +92,31 @@ export const insertGuestbookNote = async (note: GuestNote): Promise<GuestNote> =
     await insertToBlob(note);
     return note;
   }
-
   insertToSqlite(note);
   return note;
 };
+
+/* ── Admin API ── */
+
+export type PaginatedResult<T> = {
+  data: T[];
+  pagination: { page: number; pageSize: number; total: number; totalPages: number };
+};
+
+export function listGuestbookAdmin(page: number, pageSize: number): PaginatedResult<GuestNote> {
+  const db = getPortfolioDb();
+  const total = (db.prepare("SELECT COUNT(*) as c FROM guestbook_notes").get() as { c: number }).c;
+  const rows = db
+    .prepare("SELECT id, author, message, created_at FROM guestbook_notes ORDER BY created_at DESC LIMIT ? OFFSET ?")
+    .all(pageSize, (page - 1) * pageSize) as GuestbookRow[];
+
+  return {
+    data: rows.map((r) => ({ id: r.id, author: r.author, message: r.message, createdAt: r.created_at })),
+    pagination: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) || 1 },
+  };
+}
+
+export function deleteGuestbookNote(id: string): void {
+  const db = getPortfolioDb();
+  db.prepare("DELETE FROM guestbook_notes WHERE id = ?").run(id);
+}

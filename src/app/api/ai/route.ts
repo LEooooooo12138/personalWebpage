@@ -1,4 +1,4 @@
-import { profile } from "@/lib/portfolio-data";
+import { getProfile } from "@/lib/profile-db";
 import { NextResponse } from "next/server";
 
 type AskPayload = {
@@ -6,13 +6,14 @@ type AskPayload = {
   lang?: "en" | "zh";
 };
 
-const answerByKeyword = (question: string, lang: "en" | "zh") => {
+const answerByKeyword = (question: string, lang: "en" | "zh", profile: Record<string, string>) => {
   const q = question.toLowerCase();
+  const stack = JSON.parse(profile.stack || "[]");
 
   if (q.includes("stack") || q.includes("skill") || q.includes("技术") || q.includes("技能")) {
     return lang === "zh"
-      ? `我的核心技术栈包括：${profile.stack.join("、")}。`
-      : `Core stack: ${profile.stack.join(", ")}.`;
+      ? `我的核心技术栈包括：${stack.join("、")}。`
+      : `Core stack: ${stack.join(", ")}.`;
   }
   if (q.includes("project") || q.includes("项目")) {
     return lang === "zh"
@@ -52,8 +53,10 @@ export async function POST(request: Request) {
     );
   }
 
+  const profile = getProfile();
+
   return NextResponse.json({
-    answer: answerByKeyword(question, lang),
+    answer: answerByKeyword(question, lang, profile),
     source:
       lang === "zh"
         ? "基于规则的示例接口（生产环境可替换为真实 LLM）"

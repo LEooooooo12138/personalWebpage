@@ -1,23 +1,18 @@
 import { list, put } from "@vercel/blob";
-import { getSingletonDb, shouldUseBlob } from "@/lib/db-factory";
+import { getPortfolioDb } from "@/lib/portfolio-db";
+import { shouldUseBlob } from "@/lib/db-factory";
 
 type VisitResult = {
   count: number;
   incremented: boolean;
 };
 
-const VISIT_PREFIX = "visits/pages/";
+type VisitStats = {
+  page: string;
+  count: number;
+};
 
-const SCHEMA_SQL = `
-  CREATE TABLE IF NOT EXISTS page_visits (
-    page TEXT NOT NULL,
-    session_id TEXT NOT NULL,
-    created_at TEXT NOT NULL,
-    PRIMARY KEY (page, session_id)
-  );
-  CREATE INDEX IF NOT EXISTS idx_page_visits_page
-  ON page_visits(page);
-`;
+const VISIT_PREFIX = "visits/pages/";
 
 const normalizePage = (page: string) =>
   page
@@ -32,7 +27,7 @@ const normalizeSessionId = (sessionId: string) =>
     .replace(/[^a-z0-9-]/g, "")
     .slice(0, 64);
 
-/* ── Blob 后端 ── */
+/* ── Blob backend ── */
 
 const countPageFromBlob = async (page: string): Promise<number> => {
   let cursor: string | undefined;
@@ -71,55 +66,32 @@ const recordBlobVisit = async (page: string, sessionId: string): Promise<VisitRe
   return { count, incremented };
 };
 
-/* ── SQLite 后端 ── */
+/* ── SQLite backend ── */
 
 const recordSqliteVisit = (page: string, sessionId: string): VisitResult => {
-  const db = getSingletonDb("visits", SCHEMA_SQL);
+  const db = getPortfolioDb();
   const result = db
     .prepare(
-      `
-      INSERT OR IGNORE INTO page_visits (page, session_id, created_at)
-      VALUES (?, ?, ?)
-      `,
+      `INSERT OR IGNORE INTO page_visits (page, session_id, created_at) VALUES (?, ?, ?)`,
     )
     .run(page, sessionId, new Date().toISOString());
 
   const row = db
-    .prepare(
-      `
-      SELECT COUNT(*) as count
-      FROM page_visits
-      WHERE page = ?
-      `,
-    )
+    .prepare(`SELECT COUNT(*) as count FROM page_visits WHERE page = ?`)
     .get(page) as { count: number };
 
-  return {
-    count: row?.count ?? 0,
-    incremented: result.changes > 0,
-  };
+  return { count: row?.count ?? 0, incremented: result.changes > 0 };
 };
 
-/* ── 对外接口 ── */
+/* ── Public API ── */
 
 export const getPageVisitCount = async (pageInput: string): Promise<number> => {
   const page = normalizePage(pageInput);
 
-  if (shouldUseBlob()) {
-    return countPageFromBlob(page);
-  }
+  if (shouldUseBlob()) return countPageFromBlob(page);
 
-  const db = getSingletonDb("visits", SCHEMA_SQL);
-  const row = db
-    .prepare(
-      `
-      SELECT COUNT(*) as count
-      FROM page_visits
-      WHERE page = ?
-      `,
-    )
-    .get(page) as { count: number };
-
+  const db = getPortfolioDb();
+  const row = db.prepare("SELECT COUNT(*) as count FROM page_visits WHERE page = ?").get(page) as { count: number };
   return row?.count ?? 0;
 };
 
@@ -129,13 +101,20 @@ export const recordPageVisit = async (
 ): Promise<VisitResult> => {
   const page = normalizePage(pageInput);
   const sessionId = normalizeSessionId(sessionIdInput);
-  if (!sessionId) {
-    throw new Error("Invalid session id.");
-  }
+  if (!sessionId) throw new Error("Invalid session id.");
 
-  if (shouldUseBlob()) {
-    return recordBlobVisit(page, sessionId);
-  }
-
+  if (shouldUseBlob()) return recordBlobVisit(page, sessionId);
   return recordSqliteVisit(page, sessionId);
 };
+
+/* ── Admin API ── */
+
+export function getVisitStats(): { total: number; pages: VisitStats[] } {
+  const db = getPortfolioDb();
+  const total = (db.prepare("SELECT COUNT(*) as c FROM page_visits").get() as { c: number }).c;
+  const pages = db.prepare(
+    "SELECT page, COUNT(*) as count FROM page_visits GROUP BY page ORDER BY count DESC",
+  ).all() as VisitStats[];
+
+  return { total, pages };
+}
