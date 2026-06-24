@@ -179,6 +179,7 @@ function runMigrations(db: Database.Database) {
     migrateFromVisitsDb(db);
     seedStaticData(db);
     migrateProjectTags(db);
+    seedSkillRelations(db);
   }
   // Always ensure admin user exists (re-seed if deleted)
   seedAdminUser(db);
@@ -318,6 +319,78 @@ function seedStaticData(db: Database.Database) {
   tx();
 
   console.log("[migration] Seeded static data (profile, experiences, projects, guestbook)");
+}
+
+
+function seedSkillRelations(db: Database.Database) {
+  // Check if already seeded
+  const count = (db.prepare("SELECT COUNT(*) as c FROM project_skills").get() as { c: number }).c;
+  if (count > 0) return;
+
+  const tx = db.transaction(() => {
+    // ── New skills (not in old skills.db seed) ──
+    const addSkill = db.prepare("INSERT OR IGNORE INTO skills (name, category_id, proficiency, sort_order) VALUES (?, ?, ?, ?)");
+    addSkill.run("TypeScript", "frontend", 80, 4);
+    addSkill.run("Next.js", "frontend", 85, 5);
+    addSkill.run("Tailwind", "frontend", 85, 6);
+    addSkill.run("Computer Vision", "backend", 75, 6);
+    addSkill.run("Figma", "tools", 70, 3);
+
+    // ── Project skills ──
+    const addProjSkill = db.prepare("INSERT OR IGNORE INTO project_skills (project_id, skill_name, category_id, sort_order) VALUES (?, ?, ?, ?)");
+
+    // personal-web-v3: React, TypeScript, SQL (2025-present)
+    addProjSkill.run("personal-web-v3", "React", "frontend", 0);
+    addProjSkill.run("personal-web-v3", "TypeScript", "frontend", 1);
+    addProjSkill.run("personal-web-v3", "SQL", "backend", 2);
+
+    // smart-energy: Figma (2024)
+    addProjSkill.run("smart-energy", "Figma", "tools", 0);
+
+    // yolov5-detection: Python, Vue (2025)
+    addProjSkill.run("yolov5-detection", "Python", "backend", 0);
+    addProjSkill.run("yolov5-detection", "Vue", "frontend", 1);
+
+    // ── Experience skills ──
+    const addExpSkill = db.prepare("INSERT OR IGNORE INTO experience_skills (experience_id, skill_name, category_id, sort_order) VALUES (?, ?, ?, ?)");
+    const getExpId = db.prepare("SELECT id FROM experiences WHERE year = ? LIMIT 1");
+
+    // 2026: Software Engineer
+    const exp2026 = getExpId.get("2026") as { id: string } | undefined;
+    if (exp2026) {
+      addExpSkill.run(exp2026.id, "React", "frontend", 0);
+      addExpSkill.run(exp2026.id, "TypeScript", "frontend", 1);
+      addExpSkill.run(exp2026.id, "Next.js", "frontend", 2);
+      addExpSkill.run(exp2026.id, "SQL", "backend", 3);
+    }
+
+    // 2025: Research Assistant
+    const exp2025 = getExpId.get("2025") as { id: string } | undefined;
+    if (exp2025) {
+      addExpSkill.run(exp2025.id, "Python", "backend", 0);
+      addExpSkill.run(exp2025.id, "Computer Vision", "backend", 1);
+      addExpSkill.run(exp2025.id, "Vue", "frontend", 2);
+    }
+
+    // 2024: Internship + Website
+    const exp2024 = getExpId.get("2024") as { id: string } | undefined;
+    if (exp2024) {
+      addExpSkill.run(exp2024.id, "React", "frontend", 0);
+      addExpSkill.run(exp2024.id, "Vue", "frontend", 1);
+      addExpSkill.run(exp2024.id, "Git", "tools", 2);
+      addExpSkill.run(exp2024.id, "Figma", "tools", 3);
+    }
+
+    // 2023: UTS Master
+    const exp2023 = getExpId.get("2023") as { id: string } | undefined;
+    if (exp2023) {
+      addExpSkill.run(exp2023.id, "Java", "backend", 0);
+      addExpSkill.run(exp2023.id, "Python", "backend", 1);
+      addExpSkill.run(exp2023.id, "SQL", "backend", 2);
+    }
+  });
+  tx();
+  console.log("[migration] Seeded skill relations (5 new skills, 6 project links, 14 experience links)");
 }
 
 function seedAdminUser(db: Database.Database) {
