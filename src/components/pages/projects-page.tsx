@@ -3,16 +3,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { Language } from "@/lib/i18n";
 import { useHydratedLanguage } from "@/lib/use-hydrated-language";
-import { Project } from "@/types/portfolio";
+import { Project, ProjectSkill } from "@/types/portfolio";
+import { SkillTag } from "@/components/SkillTag";
 
 export function ProjectsPage({ serverLang }: { serverLang: Language }) {
   const { m, lang, mounted } = useHydratedLanguage(serverLang);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<(Project & { skills?: ProjectSkill[] })[]>([]);
 
   const fetchProjects = useCallback(async () => {
     const response = await fetch("/api/projects");
     if (!response.ok) return;
-    setProjects((await response.json()) as Project[]);
+    setProjects((await response.json()) as (Project & { skills?: ProjectSkill[] })[]);
   }, []);
 
   useEffect(() => {
@@ -65,8 +66,16 @@ export function ProjectsPage({ serverLang }: { serverLang: Language }) {
                 </div>
                 <p className="summary">{summary}</p>
                 <div className="proj-meta">
-                  {project.tags.map((tag) => (
-                    <span key={tag} className="tag">{tag}</span>
+                  {(project.skills && project.skills.length > 0
+                    ? project.skills
+                    : project.tags.map((t) => ({ name: t, category: "", color: "gold" as const }))
+                  ).map((skill) => (
+                    <SkillTag
+                      key={skill.name}
+                      name={skill.name}
+                      color={skill.color}
+                      size="sm"
+                    />
                   ))}
                   <span className="hint">{videoHint}</span>
                 </div>
