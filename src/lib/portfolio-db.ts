@@ -22,6 +22,8 @@ export function getPortfolioDb(): Database.Database {
     runMigrations(db);
     globalThis.__portfolioDb = db;
   }
+  // Ensure i18n tables exist even for cached connections (idempotent CREATE IF NOT EXISTS)
+  migrateI18nTables(globalThis.__portfolioDb);
   return globalThis.__portfolioDb;
 }
 
@@ -114,6 +116,35 @@ function initSchema(db: Database.Database) {
       FOREIGN KEY (skill_name, category_id) REFERENCES skills(name, category_id)
     );
 
+    CREATE TABLE IF NOT EXISTS project_i18n (
+      project_id TEXT NOT NULL,
+      lang TEXT NOT NULL,
+      title TEXT NOT NULL DEFAULT '',
+      summary TEXT NOT NULL DEFAULT '',
+      video_hint TEXT NOT NULL DEFAULT '',
+      PRIMARY KEY (project_id, lang),
+      FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS experience_i18n (
+      experience_id TEXT NOT NULL,
+      lang TEXT NOT NULL,
+      title TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      note TEXT NOT NULL DEFAULT '',
+      PRIMARY KEY (experience_id, lang),
+      FOREIGN KEY (experience_id) REFERENCES experiences(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS skill_i18n (
+      name TEXT NOT NULL,
+      category_id TEXT NOT NULL,
+      lang TEXT NOT NULL,
+      display_name TEXT NOT NULL,
+      PRIMARY KEY (name, category_id, lang),
+      FOREIGN KEY (name, category_id) REFERENCES skills(name, category_id) ON DELETE CASCADE
+    );
+
     CREATE TABLE IF NOT EXISTS languages (
       lang TEXT NOT NULL,
       name TEXT NOT NULL,
@@ -184,6 +215,8 @@ function runMigrations(db: Database.Database) {
   }
   // Always ensure admin user exists (re-seed if deleted)
   seedAdminUser(db);
+  // Always run i18n seed (idempotent: INSERT OR IGNORE)
+  seedI18nData(db);
 }
 
 function migrateFromSkillsDb(db: Database.Database) {
@@ -411,3 +444,84 @@ function seedAdminUser(db: Database.Database) {
   );
   console.log("[migration] Admin user seeded");
 }
+function migrateI18nTables(db: Database.Database) {
+  // Ensure i18n tables exist for DBs initialized before these were added to initSchema
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS project_i18n (
+      project_id TEXT NOT NULL,
+      lang TEXT NOT NULL,
+      title TEXT NOT NULL DEFAULT '',
+      summary TEXT NOT NULL DEFAULT '',
+      video_hint TEXT NOT NULL DEFAULT '',
+      PRIMARY KEY (project_id, lang),
+      FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS experience_i18n (
+      experience_id TEXT NOT NULL,
+      lang TEXT NOT NULL,
+      title TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      note TEXT NOT NULL DEFAULT '',
+      PRIMARY KEY (experience_id, lang),
+      FOREIGN KEY (experience_id) REFERENCES experiences(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS skill_i18n (
+      name TEXT NOT NULL,
+      category_id TEXT NOT NULL,
+      lang TEXT NOT NULL,
+      display_name TEXT NOT NULL,
+      PRIMARY KEY (name, category_id, lang),
+      FOREIGN KEY (name, category_id) REFERENCES skills(name, category_id) ON DELETE CASCADE
+    );
+  `);
+}
+
+function seedI18nData(db: Database.Database) {
+  const count = (db.prepare("SELECT COUNT(*) as c FROM project_i18n").get() as { c: number }).c;
+  if (count > 0) return;
+
+  const tx = db.transaction(() => {
+    const insP = db.prepare("INSERT OR IGNORE INTO project_i18n (project_id, lang, title, summary, video_hint) VALUES (?, ?, ?, ?, ?)");
+    const insE = db.prepare("INSERT OR IGNORE INTO experience_i18n (experience_id, lang, title, description, note) VALUES (?, ?, ?, ?, ?)");
+
+    // ── Project i18n ──
+    const getPid = db.prepare("SELECT id FROM projects WHERE id = ?");
+
+    // personal-web-v3
+    if (getPid.get("personal-web-v3")) {
+      insP.run("personal-web-v3", "zh", "个人主页", "这是我的个人主页，基于 VUE 架构构建。我相信这个网站可以帮助你更好地了解我。", "链接：暂未发布");
+    }
+    // smart-energy
+    if (getPid.get("smart-energy")) {
+      insP.run("smart-energy", "zh", "智能用电管理", "该项目致力于打造更可控的智能家居用电系统，未来将结合 AI 帮助用户更直观地了解自发电收益与支出。", "链接：暂未发布");
+    }
+    // yolov5-detection
+    if (getPid.get("yolov5-detection")) {
+      insP.run("yolov5-detection", "zh", "基于 YOLOv5 的图像检测", "该项目用于实时图像或视频流检测，当前可检测上传图像，后续将支持权重参数调节和视频流检测。", "链接：未完成");
+    }
+
+    // ── Experience i18n ──
+    const getEid = db.prepare("SELECT id FROM experiences WHERE year = ? LIMIT 1");
+    const experienceZh = [
+      { year: "2018", title: "留学起点 - 墨尔本 Trinity College", description: "2018 年我来到墨尔本，开启留学生活。在陌生环境里逐步适应独立生活、结识新朋友，并完成学习方式的转变。", note: "关键词：适应力与自我管理" },
+      { year: "2019", title: "莫纳什大学 - 信息技术本科阶段", description: "进入莫纳什大学后，我开始系统学习软件开发。课程更强调自主学习和时间管理，这一阶段夯实了我的工程基础。", note: "关键词：软件基础与自主学习" },
+      { year: "2020-2021", title: "疫情阶段线上学习", description: "疫情期间我主要在中国进行线上课程。虽然沟通不便，但这段经历提升了我的专注度、持续性和自律能力。", note: "关键词：韧性与持续性" },
+      { year: "2022", title: "回归校园与毕业阶段", description: "回到校园后，我在毕业项目压力下继续推进团队协作与项目交付，进一步提升了在约束条件下的执行能力。", note: "关键词：压力下交付" },
+      { year: "2023", title: "UTS 软件开发硕士阶段", description: "2023 年我从墨尔本搬到悉尼，在悉尼科技大学继续软件开发方向硕士学习，适应新城市并拓展产品视角。", note: "关键词：进阶学习与跨城转变" },
+      { year: "2024", title: "实习 + 个人主页持续迭代", description: "在继续学习的同时，我进行实习并持续更新个人网站，把前端、后端与用户体验更完整地串联起来。", note: "关键词：全栈实战" },
+      { year: "2025", title: "浙江大学研究助理", description: "在浙江大学担任研究助理，研究方向为 AI 视觉相关项目，参与模型实验、效果评估与工程化支持。", note: "关键词：AI 视觉研究" },
+      { year: "2026", title: "智慧沟通有限公司 - 软件工程岗位", description: "目前就职于智慧沟通有限公司，参与产品研发与技术落地，同时持续推进个人主页 V3 的迭代。", note: "关键词：在职状态与工程实践" },
+    ];
+    for (const zh of experienceZh) {
+      const row = getEid.get(zh.year) as { id: string } | undefined;
+      if (row) {
+        insE.run(row.id, "zh", zh.title, zh.description, zh.note);
+      }
+    }
+  });
+  tx();
+  console.log("[migration] Seeded i18n data (project_i18n, experience_i18n)");
+}
+

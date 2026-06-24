@@ -211,21 +211,28 @@ export function getSkillsWithUsage(lang: string): SkillsResponse {
   const base = getSkills(lang);
   const db = getPortfolioDb();
 
-  // Collect project refs (id, title, summary) per skill
+  // Collect project refs (id, title, summary) per skill, localized
   const projectRows = db.prepare(`
-    SELECT DISTINCT ps.skill_name, p.id, p.title, p.summary, p.time_period
+    SELECT DISTINCT ps.skill_name, p.id,
+      COALESCE(pi.title, p.title) as title,
+      COALESCE(pi.summary, p.summary) as summary,
+      p.time_period
     FROM project_skills ps
     JOIN projects p ON p.id = ps.project_id
+    LEFT JOIN project_i18n pi ON pi.project_id = p.id AND pi.lang = ?
     ORDER BY ps.skill_name, p.id
-  `).all() as { skill_name: string; id: string; title: string; summary: string; time_period: string }[];
+  `).all(lang) as { skill_name: string; id: string; title: string; summary: string; time_period: string }[];
 
-  // Collect experience refs (id, year, title, description) per skill
+  // Collect experience refs (id, year, title, description) per skill, localized
   const experienceRows = db.prepare(`
-    SELECT DISTINCT es.skill_name, e.id, e.year, e.title, e.description
+    SELECT DISTINCT es.skill_name, e.id, e.year,
+      COALESCE(ei.title, e.title) as title,
+      COALESCE(ei.description, e.description) as description
     FROM experience_skills es
     JOIN experiences e ON e.id = es.experience_id
+    LEFT JOIN experience_i18n ei ON ei.experience_id = e.id AND ei.lang = ?
     ORDER BY es.skill_name, e.sort_order
-  `).all() as { skill_name: string; id: string; year: string; title: string; description: string }[];
+  `).all(lang) as { skill_name: string; id: string; year: string; title: string; description: string }[];
 
   const projMap = new Map<string, { id: string; title: string; summary?: string; time_period?: string }[]>();
   for (const row of projectRows) {
