@@ -293,13 +293,14 @@ a { color: inherit; text-decoration: none; }
 .skills-related-col-dot { width: 6px; height: 6px; border-radius: 50%; }
 .skills-related-item { margin-bottom: 10px; }
 .skills-related-item:last-child { margin-bottom: 0; }
-.skills-related-item-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; }
+.skills-related-item-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; display: flex; align-items: baseline; gap: 8px; }
+.skills-related-item-time { font-size: 10px; font-weight: 400; color: var(--text-muted); letter-spacing: 0.04em; white-space: nowrap; }
 .skills-related-item-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-top: 1px; }
 .skills-related-empty { font-size: 11px; color: var(--text-muted); font-style: italic; }
 /* ── Shared Skill Tag ── */
 .skill-tag-inline {
   display: inline-flex; align-items: center; gap: 0.3rem;
-  border-radius: 6px; font-weight: 500;
+  border-radius: 8px; font-weight: 500;
   cursor: default; transition: transform 0.2s ease, box-shadow 0.2s ease;
   white-space: nowrap; user-select: none;
 }
@@ -499,7 +500,7 @@ a { color: inherit; text-decoration: none; }
 /* snapshot card */
 .exp-snapshot {
   display: flex; gap: 0.6rem; margin: 0.7rem 0 0;
-  padding: 0.55rem 0.8rem; border-radius: 6px;
+  padding: 0.55rem 0.8rem; border-radius: 8px;
   background: var(--bg-warm); border: 1px solid var(--border);
   font-size: 0.78rem; font-family: var(--mono); color: var(--text-muted);
 }

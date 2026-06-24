@@ -64,7 +64,8 @@ function initSchema(db: Database.Database) {
       demo_url TEXT NOT NULL DEFAULT '',
       repo_url TEXT NOT NULL DEFAULT '',
       video_hint TEXT NOT NULL DEFAULT '',
-      claps INTEGER NOT NULL DEFAULT 0
+      claps INTEGER NOT NULL DEFAULT 0,
+      time_period TEXT NOT NULL DEFAULT ''
     );
 
     CREATE TABLE IF NOT EXISTS skill_categories (
@@ -293,9 +294,9 @@ function seedStaticData(db: Database.Database) {
   ];
 
   const projectsData = [
-    { id: "smart-energy", title: "Smart Energy Manager", summary: "An energy-control concept for smart homes focused on visibility and predictive usage insights.", tags: "[\"Java\", \"SQL\", \"Cloud\"]", demo_url: "", repo_url: "", video_hint: "Hover to preview: usage dashboard and scenario simulation", claps: 0 },
-    { id: "personal-web-v3", title: "Personal Web V3", summary: "A dynamic portfolio platform with interactive Bento layout, AI assistant, and visitor feedback loop.", tags: "[\"Next.js\", \"Tailwind\", \"Framer Motion\", \"API\"]", demo_url: "", repo_url: "", video_hint: "Hover to preview: Bento UI transitions + realtime counters", claps: 0 },
-    { id: "yolov5-detection", title: "YOLOv5 Detection Toolkit", summary: "Image and stream detection flow with planned custom-weight tuning and result visualization.", tags: "[\"Python\", \"YOLOv5\", \"Computer Vision\"]", demo_url: "", repo_url: "", video_hint: "Hover to preview: frame-by-frame detection overlays", claps: 0 },
+    { id: "smart-energy", title: "Smart Energy Manager", summary: "An energy-control concept for smart homes focused on visibility and predictive usage insights.", tags: "[\"Java\", \"SQL\", \"Cloud\"]", demo_url: "", repo_url: "", video_hint: "Hover to preview: usage dashboard and scenario simulation", claps: 0, time_period: "2024" },
+    { id: "personal-web-v3", title: "Personal Web V3", summary: "A dynamic portfolio platform with interactive Bento layout, AI assistant, and visitor feedback loop.", tags: "[\"Next.js\", \"Tailwind\", \"Framer Motion\", \"API\"]", demo_url: "", repo_url: "", video_hint: "Hover to preview: Bento UI transitions + realtime counters", claps: 0, time_period: "2025-Present" },
+    { id: "yolov5-detection", title: "YOLOv5 Detection Toolkit", summary: "Image and stream detection flow with planned custom-weight tuning and result visualization.", tags: "[\"Python\", \"YOLOv5\", \"Computer Vision\"]", demo_url: "", repo_url: "", video_hint: "Hover to preview: frame-by-frame detection overlays", claps: 0, time_period: "2025" },
   ];
 
   const tx = db.transaction(() => {
@@ -308,8 +309,8 @@ function seedStaticData(db: Database.Database) {
       );
     }
     for (const proj of projectsData) {
-      db.prepare("INSERT OR IGNORE INTO projects (id, title, summary, tags, demo_url, repo_url, video_hint, claps) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run(
-        proj.id, proj.title, proj.summary, proj.tags, proj.demo_url, proj.repo_url, proj.video_hint, proj.claps,
+      db.prepare("INSERT OR IGNORE INTO projects (id, title, summary, tags, demo_url, repo_url, video_hint, claps, time_period) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(
+        proj.id, proj.title, proj.summary, proj.tags, proj.demo_url, proj.repo_url, proj.video_hint, proj.claps, proj.time_period,
       );
     }
     db.prepare("INSERT OR IGNORE INTO guestbook_notes (id, author, message, created_at) VALUES (?, ?, ?, ?)").run(

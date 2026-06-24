@@ -29,6 +29,7 @@ export type UsedInRef = {
   id: string;
   title: string;
   summary?: string;
+  time_period?: string;
 };
 
 export type UsedInExpRef = {

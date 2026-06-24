@@ -62,7 +62,7 @@ export function SkillTag({
         style={{
           background: lightAccent,
           color: accent,
-          border: `1px solid ${accent}33`,
+          border: `1px solid ${accent}66`,
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}

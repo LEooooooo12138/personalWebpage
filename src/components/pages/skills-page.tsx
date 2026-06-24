@@ -220,7 +220,12 @@ export function SkillsPage({
                             {hasProjects ? (
                               projects.map((p) => (
                                 <div key={p.id} className="skills-related-item">
-                                  <div className="skills-related-item-title">{p.title}</div>
+                                  <div className="skills-related-item-title">
+                                    {p.title}
+                                    {p.time_period && (
+                                      <span className="skills-related-item-time">{p.time_period}</span>
+                                    )}
+                                  </div>
                                   {p.summary && (
                                     <div className="skills-related-item-desc">{p.summary}</div>
                                   )}

@@ -213,11 +213,11 @@ export function getSkillsWithUsage(lang: string): SkillsResponse {
 
   // Collect project refs (id, title, summary) per skill
   const projectRows = db.prepare(`
-    SELECT DISTINCT ps.skill_name, p.id, p.title, p.summary
+    SELECT DISTINCT ps.skill_name, p.id, p.title, p.summary, p.time_period
     FROM project_skills ps
     JOIN projects p ON p.id = ps.project_id
     ORDER BY ps.skill_name, p.id
-  `).all() as { skill_name: string; id: string; title: string; summary: string }[];
+  `).all() as { skill_name: string; id: string; title: string; summary: string; time_period: string }[];
 
   // Collect experience refs (id, year, title, description) per skill
   const experienceRows = db.prepare(`
@@ -227,10 +227,10 @@ export function getSkillsWithUsage(lang: string): SkillsResponse {
     ORDER BY es.skill_name, e.sort_order
   `).all() as { skill_name: string; id: string; year: string; title: string; description: string }[];
 
-  const projMap = new Map<string, { id: string; title: string; summary?: string }[]>();
+  const projMap = new Map<string, { id: string; title: string; summary?: string; time_period?: string }[]>();
   for (const row of projectRows) {
     if (!projMap.has(row.skill_name)) projMap.set(row.skill_name, []);
-    projMap.get(row.skill_name)!.push({ id: row.id, title: row.title, summary: row.summary });
+    projMap.get(row.skill_name)!.push({ id: row.id, title: row.title, summary: row.summary, time_period: row.time_period || undefined });
   }
 
   const expMap = new Map<string, { id: string; year: string; title: string; description?: string }[]>();
