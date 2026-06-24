@@ -10,11 +10,29 @@ export type Project = {
   id: string;
   title: string;
   summary: string;
-  tags: string[];
+  tags: string[];        // deprecated but kept for backward compatibility
+  skills?: ProjectSkill[];
   demoUrl: string;
   repoUrl: string;
   videoHint: string;
   claps: number;
+};
+
+export type ProjectSkill = {
+  name: string;
+  category: string;
+  categoryId?: string;
+  color: string;
+};
+
+export type UsedIn = {
+  projects: string[];
+  experiences: string[];
+};
+
+export type SkillWithUsage = {
+  name: string;
+  used_in: UsedIn;
 };
 
 export type GuestNote = {
@@ -29,6 +47,7 @@ export type ExperienceNode = {
   title: string;
   description: string;
   note?: string;
+  skills?: ProjectSkill[];
 };
 
 export type SkillCategory = {
@@ -36,7 +55,7 @@ export type SkillCategory = {
   color: string;
   title: string;
   description: string;
-  skills: string[];
+  skills: (string | SkillWithUsage)[];
 };
 
 export type SkillsResponse = {
