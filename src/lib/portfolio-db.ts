@@ -148,7 +148,7 @@ function migrateProjectTags(db: Database.Database) {
   const projects = db.prepare("SELECT id, tags FROM projects WHERE tags IS NOT NULL AND tags != '' AND tags != '[]'").all() as { id: string; tags: string }[];
   
   const insertStmt = db.prepare("INSERT OR IGNORE INTO project_skills (project_id, skill_name, category_id, sort_order) VALUES (?, ?, ?, ?)");
-  const catStmt = db.prepare("SELECT category_id FROM skills WHERE name = ? LIMIT 1");
+  const catStmt = db.prepare("SELECT category_id FROM skills WHERE name = ? ORDER BY category_id LIMIT 1");
   
   const tx = db.transaction(() => {
     for (const proj of projects) {
