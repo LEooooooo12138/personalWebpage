@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 const COLOR_VARS: Record<string, string> = {
   gold: "var(--gold)",
@@ -28,7 +29,6 @@ export function SkillTag({
   const [hovered, setHovered] = useState(false);
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
-  const popupRef = useRef<HTMLDivElement>(null);
   const [popupStyle, setPopupStyle] = useState<React.CSSProperties>({});
 
   useEffect(() => {
@@ -38,9 +38,8 @@ export function SkillTag({
         position: "fixed",
         top: rect.bottom + 8,
         left: Math.max(8, rect.left),
-        zIndex: 100,
+        zIndex: 9999,
       });
-      // Delay visibility for fade-in
       const t = setTimeout(() => setVisible(true), 20);
       return () => clearTimeout(t);
     } else {
@@ -71,20 +70,21 @@ export function SkillTag({
         <span className="skill-tag-dot" style={{ background: accent }} />
         {name}
       </span>
-      {hovered && (
-        <div
-          ref={popupRef}
-          style={popupStyle}
-          className={`skill-tag-popup ${visible ? "skill-tag-popup--visible" : ""}`}
-        >
-          <div className="skill-tag-popup-name" style={{ color: accent }}>
-            {name}
-          </div>
-          {category && (
-            <div className="skill-tag-popup-cat">{category}</div>
-          )}
-        </div>
-      )}
+      {hovered &&
+        createPortal(
+          <div
+            style={popupStyle}
+            className={`skill-tag-popup ${visible ? "skill-tag-popup--visible" : ""}`}
+          >
+            <div className="skill-tag-popup-name" style={{ color: accent }}>
+              {name}
+            </div>
+            {category && (
+              <div className="skill-tag-popup-cat">{category}</div>
+            )}
+          </div>,
+          document.body
+        )}
     </>
   );
 }
