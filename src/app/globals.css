@@ -468,6 +468,14 @@ a { color: inherit; text-decoration: none; }
 .exp-item:nth-child(7) .exp-tag { border-color: var(--gold-light); color: var(--gold); }
 .exp-item:nth-child(8) .exp-tag { border-color: var(--terracotta-light); color: var(--terracotta); }
 
+/* ── tech skill tags (under keyword tags) ── */
+.exp-tech-tags {
+  display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.4rem;
+}
+.exp-tech-tags .skill-tag-inline {
+  font-size: 0.72rem; padding: 0.15rem 0.6rem;
+}
+
 /* ── expandable detail ── */
 .exp-item[role="button"] { cursor: pointer; }
 .exp-item[role="button"]:hover .ec h3 { color: var(--gold); }
