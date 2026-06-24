@@ -16,6 +16,7 @@ export type Project = {
   repoUrl: string;
   videoHint: string;
   claps: number;
+  timePeriod?: string;
 };
 
 export type ProjectSkill = {
