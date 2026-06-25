@@ -27,7 +27,7 @@
         "Python",
         "Swift",
         "PHP",
-        "Computer Vision"
+        "计算机视觉"
       ]
     },
     {
@@ -37,8 +37,8 @@
       "description": "Git、云计算与敏捷开发——支撑工程团队交付的基础实践。",
       "skills": [
         "Git",
-        "Cloud Computing",
-        "Agile Project Management",
+        "云计算",
+        "敏捷项目管理",
         "Figma"
       ]
     },
@@ -51,6 +51,19 @@
         "UE5",
         "Unity",
         "Maya"
+      ]
+    },
+    {
+      "id": "ai",
+      "color": "terracotta",
+      "title": "AI 能力",
+      "description": "深度学习、语音与 Transformer 模型——探索智能系统的边界。",
+      "skills": [
+        "卷积神经网络",
+        "Transformer 架构",
+        "语音识别",
+        "语音合成",
+        "Vibe Coding"
       ]
     }
   ],

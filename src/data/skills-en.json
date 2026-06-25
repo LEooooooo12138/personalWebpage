@@ -52,6 +52,19 @@
         "Unity",
         "Maya"
       ]
+    },
+    {
+      "id": "ai",
+      "color": "terracotta",
+      "title": "AI Capabilities",
+      "description": "Deep learning, speech, and transformer-based models — pushing the boundary of intelligent systems.",
+      "skills": [
+        "CNN",
+        "Transformer",
+        "ASR",
+        "TTS",
+        "Vibe Coding"
+      ]
     }
   ],
   "languages": [

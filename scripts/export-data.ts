@@ -75,6 +75,21 @@ for (const lang of ["en", "zh"]) {
 }
 
 /* ── Skills ── */
+
+// Pre-load skill i18n names
+const skillI18nRows = db.prepare(`
+  SELECT name, category_id, lang, display_name FROM skill_i18n
+`).all() as { name: string; category_id: string; lang: string; display_name: string }[];
+
+const skillNameMap = new Map<string, string>(); // key: "name|category_id|lang"
+for (const row of skillI18nRows) {
+  skillNameMap.set(`${row.name}|${row.category_id}|${row.lang}`, row.display_name);
+}
+
+function getSkillDisplayName(name: string, categoryId: string, lang: string): string {
+  return skillNameMap.get(`${name}|${categoryId}|${lang}`) ?? name;
+}
+
 for (const lang of ["en", "zh"]) {
   const categoryRows = db.prepare(`
     SELECT sc.id, sc.color, sci.title, sci.description
@@ -93,7 +108,7 @@ for (const lang of ["en", "zh"]) {
       `).all() as any[]);
 
   const getSkillsForCategory = db.prepare(
-    "SELECT name FROM skills WHERE category_id = ? ORDER BY sort_order ASC"
+    "SELECT name, category_id FROM skills WHERE category_id = ? ORDER BY sort_order ASC"
   );
 
   const categories = catRows.map((row: any) => ({
@@ -101,7 +116,9 @@ for (const lang of ["en", "zh"]) {
     color: row.color,
     title: row.title,
     description: row.description,
-    skills: (getSkillsForCategory.all(row.id) as any[]).map((s: any) => s.name),
+    skills: (getSkillsForCategory.all(row.id) as { name: string; category_id: string }[]).map(
+      (s) => getSkillDisplayName(s.name, s.category_id, lang)
+    ),
   }));
 
   const langRows = db.prepare("SELECT name FROM languages WHERE lang = ?").all(lang) as any[];
