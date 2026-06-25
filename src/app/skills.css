@@ -226,11 +226,32 @@
 
 
 
+/* ── Mobile ── */
 @media (max-width: 768px) {
-  .skills-page { padding: 4rem 1.5rem; }
-  .skills-bg { font-size: 25vw; top: 0; }
+  .skills-page { padding: 4rem 1.5rem 6rem; }
+  .skills-bg { font-size: 25vw; top: 0; right: -5%; }
+  .skills-header { margin-bottom: 2rem; }
+  .skills-header h2 { font-size: 2.2rem; }
+  .skills-subtitle { font-size: 0.78rem; }
+
+  /* Accordion — larger touch targets */
+  .skills-row-header { padding: 0.85rem 0.25rem; gap: 0.6rem; }
+  .skills-row-header:hover { padding-left: 0.25rem; }
+  .skills-row-title { font-size: 1.15rem; }
   .skills-row-tags { display: none; }
-  .skills-row-inner { padding-left: 0.5rem; }
+  .skills-row-inner { padding: 0 0.25rem 1rem 1.2rem; }
+  .skills-row-desc { font-size: 0.82rem; max-width: 100%; }
+
+  /* Related strip */
   .skills-related-strip { flex-direction: column; gap: 14px; }
   .skills-related-col-divider { display: none; }
+  .skills-related-item-title { font-size: 12px; }
+
+  /* Languages */
+  .skills-lang { flex-direction: column; gap: 0.5rem; padding: 0.75rem 0.25rem; }
+  .skills-lang-label { font-size: 1rem; }
+  .skills-lang-list { font-size: 0.82rem; }
+
+  /* Skill tags */
+  .skill-tag-inline { font-size: 0.7rem !important; padding: 0.12rem 0.5rem !important; }
 }

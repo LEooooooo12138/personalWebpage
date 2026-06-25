@@ -227,21 +227,114 @@
 .proj-row:hover .pr-tags span { color: var(--text-soft); }
 .proj-row .pr-link { font-family: var(--mono); font-size: 0.82rem; color: var(--gold); white-space: nowrap; padding-top: 0.3rem; border-bottom: 1px solid transparent; transition: border-color 0.3s, transform 0.3s; display: inline-block; }
 .proj-row:hover .pr-link { border-color: var(--gold); transform: translateX(4px); }
-.proj-claps { font-family: var(--mono); font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem; }
-.proj-clap-btn {
-  padding: 0.4rem 0.9rem; border: 1px solid var(--border);
-  background: none; color: var(--text-soft); cursor: pointer;
-  font-family: var(--mono); font-size: 0.8rem;
-  transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.2s;
+/* ── Clap ── */
+.proj-toprow {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; margin-bottom: 0.5rem;
 }
-.proj-clap-btn:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); transform: scale(1.03); }
-.proj-clap-btn:active { transform: scale(0.97); }
+.proj-toprow h3 {
+  font-family: var(--serif); font-size: 1.6rem; font-weight: 700;
+  transition: color 0.3s; margin: 0;
+}
+
+.proj-clap-area {
+  display: flex; align-items: center; gap: 0.5rem;
+  position: relative; flex-shrink: 0;
+}
+
+/* ── Clap Button ── */
+.clap-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1.5px solid rgba(160,124,48,0.35);
+  background: none; color: rgba(160,124,48,0.55);
+  cursor: pointer; padding: 0;
+  transition: border-color 0.3s, color 0.3s, background 0.3s, transform 0.2s, box-shadow 0.3s;
+  position: relative; flex-shrink: 0;
+}
+.clap-btn:hover {
+  border-color: var(--gold); color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(160,124,48,0.08);
+}
+.clap-btn:active {
+  transform: scale(0.92);
+}
+
+/* Clapped state */
+.clap-btn.clapped {
+  background: var(--gold); border-color: var(--gold); color: #fff;
+  box-shadow: 0 0 0 4px rgba(160,124,48,0.12);
+}
+
+/* ── Clap Icon ── */
+.clap-icon {
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.clap-icon.clapped { color: #fff; }
+
+/* ── Clap Count ── */
+.clap-count {
+  font-family: var(--serif); font-size: 0.95rem; font-weight: 700;
+  color: var(--text-muted); min-width: 1.8rem; text-align: center;
+  transition: color 0.3s;
+}
+.clap-btn.clapped + .clap-count { color: var(--gold); }
+
+/* Count bump animation */
+.clap-count.bump {
+  animation: count-bump 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes count-bump {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.35); color: var(--gold); }
+  100% { transform: scale(1); }
+}
+
+/* ── Particle ── */
+.clap-particle {
+  position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+  font-family: var(--serif); font-size: 0.75rem; font-weight: 700;
+  color: var(--gold); pointer-events: none; z-index: 5;
+  animation: clap-float 0.65s ease-out forwards;
+}
+@keyframes clap-float {
+  0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  50% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-22px) scale(0.6); }
+}
 
 
 
+/* ── Mobile ── */
 @media (max-width: 768px) {
   .projects-page { padding: 4rem 1.5rem; }
-  .proj-header .num-lg { font-size: 4rem; }
-  .proj-row { grid-template-columns: 1fr; gap: 0.5rem; }
-  .proj-row .pr-num { font-size: 2.5rem; }
+  .proj-header { flex-direction: column; gap: 0.5rem; margin-bottom: 2.5rem; }
+  .proj-header h2 { font-size: 2rem; }
+
+  .proj-row {
+    grid-template-columns: auto 1fr;
+    gap: 1rem; padding: 1.5rem 0; align-items: start;
+  }
+  .proj-row .num {
+    font-family: var(--serif); font-size: 1.6rem; font-weight: 900;
+    opacity: 0.35; line-height: 1; padding-top: 0.15rem;
+  }
+
+  .proj-toprow { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .proj-toprow h3 { font-size: 1.15rem; }
+  .proj-clap-area { align-self: flex-start; }
+
+  .summary { font-size: 0.84rem; }
+  .proj-meta { gap: 0.35rem; }
+  .proj-meta .skill-tag-inline { font-size: 0.7rem; padding: 0.1rem 0.45rem; }
+  .proj-meta .hint { font-size: 0.72rem; }
+
+  /* Disable hover effects on touch */
+  .proj-row:hover { padding-left: 0; }
+  .proj-row:hover::before { background: transparent; }
+  .proj-row:active { background: rgba(160,124,48,0.03); }
+
+  .clap-btn { width: 36px; height: 36px; }
+  .clap-count { font-size: 0.85rem; }
 }

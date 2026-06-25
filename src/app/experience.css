@@ -30,15 +30,7 @@
 .proj-row:hover .pr-tags span { color: var(--text-soft); }
 .proj-row .pr-link { font-family: var(--mono); font-size: 0.82rem; color: var(--gold); white-space: nowrap; padding-top: 0.3rem; border-bottom: 1px solid transparent; transition: border-color 0.3s, transform 0.3s; display: inline-block; }
 .proj-row:hover .pr-link { border-color: var(--gold); transform: translateX(4px); }
-.proj-claps { font-family: var(--mono); font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem; }
-.proj-clap-btn {
-  padding: 0.4rem 0.9rem; border: 1px solid var(--border);
-  background: none; color: var(--text-soft); cursor: pointer;
-  font-family: var(--mono); font-size: 0.8rem;
-  transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.2s;
-}
-.proj-clap-btn:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); transform: scale(1.03); }
-.proj-clap-btn:active { transform: scale(0.97); }
+
 
 /* ═══════════ EXPERIENCE PAGE ═══════════ */
 .exp-page { padding: 6rem 3rem 8rem; position: relative; overflow: hidden; }
@@ -206,16 +198,44 @@
   transition: color 0.35s;
 }
 
-/* mobile adjustments */
+/* ── Mobile ── */
 @media (max-width: 768px) {
-  .exp-progress { left: -1rem; }
-  .exp-progress-thumb { width: 8px; height: 8px; }
-}
-
-
-
-@media (max-width: 768px) {
+  /* Experience */
   .exp-page { padding: 4rem 1.5rem; }
-  .exp-item { grid-template-columns: 1fr; gap: 0.3rem; }
-  .exp-item .ey { font-size: 2rem; }
+  .exp-header { margin-bottom: 2.5rem; }
+  .exp-year-lg { font-size: clamp(2.5rem, 10vw, 4rem); }
+  .exp-subtitle { font-size: 1.1rem; }
+
+  .exp-item { grid-template-columns: 1fr; gap: 0.3rem; padding: 1.5rem 0; }
+  .exp-item .ey { font-size: 1.8rem; }
+  .exp-item .ec h3 { font-size: 1rem; }
+  .exp-item .ec p { font-size: 0.82rem; }
+
+  /* Timeline progress bar — hidden on mobile */
+  .exp-progress { display: none; }
+
+
+  /* Expandable detail */
+  .exp-bullets li { font-size: 0.78rem; }
+  .exp-snapshot { flex-wrap: wrap; gap: 0.3rem; font-size: 0.72rem; padding: 0.45rem 0.6rem; }
+  .exp-reflection { padding: 0.5rem 0.6rem; }
+  .exp-reflection p { font-size: 0.8rem; }
+  .exp-tech-tags .skill-tag-inline { font-size: 0.68rem; padding: 0.12rem 0.5rem; }
+
+  /* Disable hover-based effects on touch */
+  .exp-item:hover { padding-left: 0; }
+  .exp-item:hover::before { opacity: 0; }
+  .exp-item:active { background: rgba(160,124,48,0.03); }
+
+  /* Lab */
+  .lab-page { padding: 4rem 1.5rem; }
+  .lab-header { margin-bottom: 2rem; }
+  .lab-header h2 { font-size: 2.2rem; }
+  .lab-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .lab-col h3 { font-size: 1.2rem; }
+  .lab-input { font-size: 0.85rem; }
+  .lab-btn { font-size: 0.82rem; padding: 0.5rem 1rem; }
+  .guest-note .author { font-size: 0.8rem; }
+  .guest-note .msg { font-size: 0.84rem; }
 }
+

@@ -137,11 +137,31 @@
 }
 
 @media (max-width: 768px) {
-  .hero { padding: 4rem 1.5rem; min-height: 90vh; }
-  .hero-content { grid-template-columns: 1fr; }
-  .hero-right { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; }
-  .hero-bg-word { font-size: 40vw; top: 60%; }
+  /* ── Hero ── */
+  .hero { padding: 5rem 1.5rem 3rem; min-height: 90vh; }
+  .hero-content { grid-template-columns: 1fr; gap: 1.5rem; }
+  .hero-left h1 { font-size: clamp(3rem, 12vw, 4.5rem); }
+  .hero-left .role { font-size: 1rem; max-width: 100%; }
+  .hero-right { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; gap: 0.75rem; }
+  .hero-stat { font-size: 0.75rem; }
+  .hero-bg-word { font-size: 40vw; top: 55%; left: 5%; }
   .scroll-indicator { display: none; }
+
+  /* ── Explore ── */
   .explore-section { padding: 4rem 1.5rem; }
-  .explore-link { grid-template-columns: 1fr; gap: 0.5rem; }
+  .explore-header { margin-bottom: 2rem; }
+  .explore-header h2 { font-size: 2rem; }
+  .explore-link {
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem; padding: 1.2rem 0; align-items: center;
+  }
+  .explore-link .el-num { font-size: 1.4rem; }
+  .explore-link .el-arrow { font-size: 1rem; padding-right: 0.25rem; }
+  .explore-link h3 { font-size: 1.1rem; }
+  .explore-link p { font-size: 0.8rem; }
+  /* Disable hover-based effects on touch */
+  .explore-link:hover { padding-left: 0; }
+  .explore-link:hover::before { background: transparent; }
+  .explore-link:active { background: rgba(160,124,48,0.04); }
 }
+

@@ -206,7 +206,18 @@
 
 
 
+/* ── Mobile ── */
 @media (max-width: 768px) {
   .lab-page { padding: 4rem 1.5rem; }
-  .lab-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .lab-header { margin-bottom: 2rem; }
+  .lab-header h2 { font-size: 2.2rem; }
+  .lab-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .lab-col h3 { font-size: 1.2rem; }
+  .lab-hint { font-size: 0.78rem; }
+  .lab-input { font-size: 0.85rem; padding: 0.55rem 0; }
+  .lab-btn { font-size: 0.82rem; padding: 0.5rem 1rem; }
+  .guest-note .author { font-size: 0.8rem; }
+  .guest-note .msg { font-size: 0.84rem; }
+  .guest-note .time { font-size: 0.68rem; }
+  .lab-error { font-size: 0.78rem; }
 }

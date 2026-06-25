@@ -74,8 +74,8 @@ export const PROJECTS: Record<string, ProjectEntry[]> = {
         { name: "SQL", category: "Back-End", color: "terracotta" },
       ],
       zh_title: "个人主页",
-      zh_summary: "这是我的个人主页，基于 VUE 架构构建。我相信这个网站可以帮助你更好地了解我。",
-      zh_videoHint: "链接：暂未发布",
+      zh_summary: "个人作品集网站，展示项目、技能与经历。基于 Next.js + React + TypeScript + Tailwind 构建，融合 Three.js 交互与 Framer Motion 动效。",
+      zh_videoHint: "在 GitHub 上查看源码",
     },
     {
       id: "smart-energy",
@@ -94,7 +94,7 @@ export const PROJECTS: Record<string, ProjectEntry[]> = {
       zh_title: "智能用电管理",
       zh_summary:
         "该项目致力于打造更可控的智能家居用电系统，未来将结合 AI 帮助用户更直观地了解自发电收益与支出。",
-      zh_videoHint: "链接：暂未发布",
+      zh_videoHint: "在 GitHub 上查看源码",
     },
     {
       id: "yolov5-detection",
