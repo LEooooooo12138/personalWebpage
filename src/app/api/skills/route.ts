@@ -1,4 +1,4 @@
-import * as staticData from "@/lib/data-static";
+import { getSkills } from "@/lib/skills-data";
 import { NextResponse } from "next/server";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -9,19 +9,15 @@ export async function GET(request: Request) {
   const withUsage = searchParams.get("usage") === "1";
 
   try {
-    if (isProd) {
-      return NextResponse.json(staticData.getSkills(lang), {
-        headers: {
-          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
-        },
+    if (withUsage && !isProd) {
+      // usage data needs DB join (project_skills, experience_skills)
+      const { getSkillsWithUsage } = await import("@/lib/skills-db");
+      return NextResponse.json(getSkillsWithUsage(lang), {
+        headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" },
       });
     }
-    const { getSkills, getSkillsWithUsage } = await import("@/lib/skills-db");
-    const data = withUsage ? getSkillsWithUsage(lang) : getSkills(lang);
-    return NextResponse.json(data, {
-      headers: {
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
-      },
+    return NextResponse.json(getSkills(lang), {
+      headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" },
     });
   } catch (err) {
     console.error("Failed to fetch skills:", err);

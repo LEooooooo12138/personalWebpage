@@ -74,61 +74,6 @@ for (const lang of ["en", "zh"]) {
   writeJson(`projects-${lang}.json`, projects);
 }
 
-/* ── Skills ── */
-
-// Pre-load skill i18n names
-const skillI18nRows = db.prepare(`
-  SELECT name, category_id, lang, display_name FROM skill_i18n
-`).all() as { name: string; category_id: string; lang: string; display_name: string }[];
-
-const skillNameMap = new Map<string, string>(); // key: "name|category_id|lang"
-for (const row of skillI18nRows) {
-  skillNameMap.set(`${row.name}|${row.category_id}|${row.lang}`, row.display_name);
-}
-
-function getSkillDisplayName(name: string, categoryId: string, lang: string): string {
-  return skillNameMap.get(`${name}|${categoryId}|${lang}`) ?? name;
-}
-
-for (const lang of ["en", "zh"]) {
-  const categoryRows = db.prepare(`
-    SELECT sc.id, sc.color, sci.title, sci.description
-    FROM skill_categories sc
-    JOIN skill_category_i18n sci ON sci.category_id = sc.id AND sci.lang = ?
-    ORDER BY sc.sort_order ASC
-  `).all(lang) as any[];
-
-  const catRows = categoryRows.length > 0
-    ? categoryRows
-    : (db.prepare(`
-        SELECT sc.id, sc.color, sci.title, sci.description
-        FROM skill_categories sc
-        JOIN skill_category_i18n sci ON sci.category_id = sc.id AND sci.lang = 'en'
-        ORDER BY sc.sort_order ASC
-      `).all() as any[]);
-
-  const getSkillsForCategory = db.prepare(
-    "SELECT name, category_id FROM skills WHERE category_id = ? ORDER BY sort_order ASC"
-  );
-
-  const categories = catRows.map((row: any) => ({
-    id: row.id,
-    color: row.color,
-    title: row.title,
-    description: row.description,
-    skills: (getSkillsForCategory.all(row.id) as { name: string; category_id: string }[]).map(
-      (s) => getSkillDisplayName(s.name, s.category_id, lang)
-    ),
-  }));
-
-  const langRows = db.prepare("SELECT name FROM languages WHERE lang = ?").all(lang) as any[];
-  const languages = langRows.length > 0
-    ? langRows.map((r: any) => r.name)
-    : (db.prepare("SELECT name FROM languages WHERE lang = 'en'").all() as any[]).map((r: any) => r.name);
-
-  writeJson(`skills-${lang}.json`, { categories, languages });
-}
-
 /* ── Experiences ── */
 for (const lang of ["en", "zh"]) {
   const rows = db.prepare(`
