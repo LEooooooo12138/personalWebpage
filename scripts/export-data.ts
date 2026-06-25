@@ -118,6 +118,96 @@ for (const lang of ["en", "zh"]) {
   writeJson(`experiences-${lang}.json`, experiences);
 }
 
+
+/* ── Skills with usage (project & experience refs) ── */
+for (const lang of ["en", "zh"]) {
+  const categoryRows = db.prepare(`
+    SELECT sc.id, sc.color, sci.title, sci.description
+    FROM skill_categories sc
+    JOIN skill_category_i18n sci ON sci.category_id = sc.id AND sci.lang = ?
+    ORDER BY sc.sort_order ASC
+  `).all(lang) as any[];
+
+  const getSkillsForCategory = db.prepare(`
+    SELECT s.name, COALESCE(si.display_name, s.name) as display_name
+    FROM skills s
+    LEFT JOIN skill_i18n si ON si.name = s.name AND si.category_id = s.category_id AND si.lang = ?
+    WHERE s.category_id = ?
+    ORDER BY s.sort_order ASC
+  `);
+
+  // Project refs per skill
+  const projectRefs = db.prepare(`
+    SELECT DISTINCT ps.skill_name, p.id,
+      COALESCE(pi.title, p.title) as title,
+      COALESCE(pi.summary, p.summary) as summary,
+      p.time_period
+    FROM project_skills ps
+    JOIN projects p ON p.id = ps.project_id
+    LEFT JOIN project_i18n pi ON pi.project_id = p.id AND pi.lang = ?
+    ORDER BY ps.skill_name, p.id
+  `).all(lang) as any[];
+
+  // Experience refs per skill
+  const experienceRefs = db.prepare(`
+    SELECT DISTINCT es.skill_name, e.id, e.year,
+      COALESCE(ei.title, e.title) as title,
+      COALESCE(ei.description, e.description) as description
+    FROM experience_skills es
+    JOIN experiences e ON e.id = es.experience_id
+    LEFT JOIN experience_i18n ei ON ei.experience_id = e.id AND ei.lang = ?
+    ORDER BY es.skill_name, e.sort_order
+  `).all(lang) as any[];
+
+  const projMap = new Map<string, any[]>();
+  for (const row of projectRefs) {
+    if (!projMap.has(row.skill_name)) projMap.set(row.skill_name, []);
+    projMap.get(row.skill_name)!.push({
+      id: row.id,
+      title: row.title,
+      summary: row.summary,
+      time_period: row.time_period || undefined,
+    });
+  }
+
+  const expMap = new Map<string, any[]>();
+  for (const row of experienceRefs) {
+    if (!expMap.has(row.skill_name)) expMap.set(row.skill_name, []);
+    expMap.get(row.skill_name)!.push({
+      id: row.id,
+      year: row.year,
+      title: row.title,
+      description: row.description || undefined,
+    });
+  }
+
+  const langRows = db.prepare("SELECT name FROM languages WHERE lang = ?").all(lang) as any[];
+  // Match refs by both raw skill name and i18n display name
+  const nameI18nRows = db.prepare(
+    "SELECT name, display_name FROM skill_i18n WHERE lang = ?"
+  ).all(lang) as any[];
+  const nameI18n = new Map<string, string>();
+  for (const row of nameI18nRows) {
+    nameI18n.set(row.name, row.display_name);
+  }
+
+  const categories = categoryRows.map((cat: any) => {
+    const skills = (getSkillsForCategory.all(lang, cat.id) as any[]).map((s: any) => {
+      const displayName = s.display_name;
+      return {
+        name: displayName,
+        used_in: {
+          projects: projMap.get(s.name) || projMap.get(displayName) || [],
+          experiences: expMap.get(s.name) || expMap.get(displayName) || [],
+        },
+      };
+    });
+    return { id: cat.id, color: cat.color, title: cat.title, description: cat.description, skills };
+  });
+
+  const languages = langRows.map((r: any) => r.name);
+  writeJson(`skills-${lang}.json`, { categories, languages });
+}
 /* ── Profile ── */
 const profileRows = db.prepare("SELECT key, value FROM profile").all() as any[];
 const profile: Record<string, string> = {};
