@@ -30,9 +30,9 @@ function writeJson(filename: string, data: unknown) {
 for (const lang of ["en", "zh"]) {
   const rows = db.prepare(`
     SELECT p.*, p.time_period,
-      COALESCE(pi.title, p.title) as title,
-      COALESCE(pi.summary, p.summary) as summary,
-      COALESCE(pi.video_hint, p.video_hint) as video_hint
+      COALESCE(NULLIF(pi.title, ''), p.title) as title,
+      COALESCE(NULLIF(pi.summary, ''), p.summary) as summary,
+      COALESCE(NULLIF(pi.video_hint, ''), p.video_hint) as video_hint
     FROM projects p
     LEFT JOIN project_i18n pi ON pi.project_id = p.id AND pi.lang = ?
     ORDER BY p.id

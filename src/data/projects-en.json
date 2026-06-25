@@ -1,17 +1,19 @@
 [
   {
     "id": "personal-web-v3",
-    "title": "Personal Web V3",
-    "summary": "A dynamic portfolio platform with interactive Bento layout, AI assistant, and visitor feedback loop.",
+    "title": "Personal Webpage",
+    "summary": "Full-stack portfolio built with Next.js, React, TypeScript, and Tailwind CSS — featuring 3D hero scenes, i18n, and Vercel Blob Storage.",
     "tags": [
       "Next.js",
+      "React",
+      "TypeScript",
       "Tailwind",
-      "Framer Motion",
-      "API"
+      "Three.js",
+      "Framer Motion"
     ],
     "demoUrl": "https://www.yaoyuanle.top",
     "repoUrl": "https://github.com/LEooooooo12138/personalWebpage",
-    "videoHint": "Hover to preview: Bento UI transitions + realtime counters",
+    "videoHint": "View source code on GitHub",
     "claps": 0,
     "timePeriod": "2025-Present",
     "skills": [
