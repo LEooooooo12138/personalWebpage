@@ -2,7 +2,7 @@
   {
     "id": "personal-web-v3",
     "title": "Personal Webpage",
-    "summary": "Full-stack portfolio built with Next.js, React, TypeScript, and Tailwind CSS — featuring 3D hero scenes, i18n, and Vercel Blob Storage.",
+    "summary": "A personal portfolio to showcase my projects, skills, and experience — built with Next.js, React, TypeScript, and Tailwind CSS, featuring 3D interactive scenes and bilingual support.",
     "tags": [
       "Next.js",
       "React",
