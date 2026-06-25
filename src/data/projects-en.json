@@ -2,7 +2,7 @@
   {
     "id": "personal-web-v3",
     "title": "Personal Webpage",
-    "summary": "A personal portfolio to showcase my projects, skills, and experience — built with Next.js, React, TypeScript, and Tailwind CSS, featuring 3D interactive scenes and bilingual support.",
+    "summary": "A personal portfolio showcasing projects, skills, and experience — built with Next.js, React, TypeScript, and Tailwind.",
     "tags": [
       "Next.js",
       "React",
