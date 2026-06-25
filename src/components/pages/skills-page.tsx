@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Language, messages } from "@/lib/i18n";
 import { useLanguage } from "@/components/language-provider";
 import { SkillsResponse, SkillWithUsage, UsedInRef, UsedInExpRef } from "@/types/portfolio";
+import { getSkills } from "@/lib/skills-data";
 
 // ── Color mapping: DB color key → CSS variable ──
 const COLOR_VARS: Record<string, string> = {
@@ -18,10 +19,8 @@ function getColorVar(colorKey: string): string {
 
 export function SkillsPage({
   serverLang,
-  skillsData,
 }: {
   serverLang: Language;
-  skillsData: SkillsResponse;
 }) {
   const { m: ctxM, lang: ctxLang } = useLanguage();
   const [mounted, setMounted] = useState(false);
@@ -31,6 +30,12 @@ export function SkillsPage({
 
   const m = mounted ? ctxM : messages[serverLang];
   const lang = mounted ? ctxLang : serverLang;
+
+  // ── Skills data — reactive to language change ──
+  const [skillsData, setSkillsData] = useState<SkillsResponse>(() => getSkills(serverLang));
+  useEffect(() => {
+    setSkillsData(getSkills(lang));
+  }, [lang]);
 
   // ── Accordion state ──
   const [expandedId, setExpandedId] = useState<string | null>(null);
