@@ -35,11 +35,11 @@ export function getSkills(lang: string): SkillsResponse {
         .all() as { id: string; color: string; title: string; description: string }[]);
 
   const getSkillsForCategory = db.prepare(
-    `SELECT name FROM skills WHERE category_id = ? ORDER BY sort_order ASC`
+    `SELECT s.name, COALESCE(si.display_name, s.name) as display_name FROM skills s LEFT JOIN skill_i18n si ON si.name = s.name AND si.category_id = s.category_id AND si.lang = ? WHERE s.category_id = ? ORDER BY s.sort_order ASC`
   );
 
   const categories: SkillCategory[] = rows.map((row) => {
-    const skills = (getSkillsForCategory.all(row.id) as { name: string }[]).map((s) => s.name);
+    const skills = (getSkillsForCategory.all(lang, row.id) as { name: string; display_name: string }[]).map((s) => s.display_name);
     return { id: row.id, color: row.color, title: row.title, description: row.description, skills };
   });
 
@@ -211,6 +211,15 @@ export function getSkillsWithUsage(lang: string): SkillsResponse {
   const base = getSkills(lang);
   const db = getPortfolioDb();
 
+  // Build name translation map: raw name → display name for this lang
+  const i18nRows = db.prepare(
+    'SELECT name, category_id, display_name FROM skill_i18n WHERE lang = ?'
+  ).all(lang) as { name: string; category_id: string; display_name: string }[];
+  const nameI18n = new Map<string, string>();
+  for (const row of i18nRows) {
+    nameI18n.set(row.name, row.display_name);
+  }
+
   // Collect project refs (id, title, summary) per skill, localized
   const projectRows = db.prepare(`
     SELECT DISTINCT ps.skill_name, p.id,
@@ -236,14 +245,16 @@ export function getSkillsWithUsage(lang: string): SkillsResponse {
 
   const projMap = new Map<string, { id: string; title: string; summary?: string; time_period?: string }[]>();
   for (const row of projectRows) {
-    if (!projMap.has(row.skill_name)) projMap.set(row.skill_name, []);
-    projMap.get(row.skill_name)!.push({ id: row.id, title: row.title, summary: row.summary, time_period: row.time_period || undefined });
+    const key = nameI18n.get(row.skill_name) ?? row.skill_name;
+    if (!projMap.has(key)) projMap.set(key, []);
+    projMap.get(key)!.push({ id: row.id, title: row.title, summary: row.summary, time_period: row.time_period || undefined });
   }
 
   const expMap = new Map<string, { id: string; year: string; title: string; description?: string }[]>();
   for (const row of experienceRows) {
-    if (!expMap.has(row.skill_name)) expMap.set(row.skill_name, []);
-    expMap.get(row.skill_name)!.push({ id: row.id, year: row.year, title: row.title, description: row.description });
+    const key = nameI18n.get(row.skill_name) ?? row.skill_name;
+    if (!expMap.has(key)) expMap.set(key, []);
+    expMap.get(key)!.push({ id: row.id, year: row.year, title: row.title, description: row.description });
   }
 
   return {
