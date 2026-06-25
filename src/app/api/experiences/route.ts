@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(result);
   } catch (err) {
-    console.error("Failed to fetch experiences:", err);
+    // console.error("Failed to fetch experiences:", err);
     return NextResponse.json(
       { error: "Failed to fetch experiences data" },
       { status: 500 }

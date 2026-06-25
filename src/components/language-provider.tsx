@@ -34,6 +34,7 @@ export function LanguageProvider({
   const setLang = (newLang: Language) => {
     setLangState(newLang);
     setLangCookie(newLang);
+    document.documentElement.lang = newLang;
   };
 
   const value = useMemo<LanguageContextValue>(

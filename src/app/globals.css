@@ -12,16 +12,18 @@
   --text: #1a1a1a;
   --text-soft: #4a4a4a;
   --text-muted: #999;
+  --text-hint: #6b6b6b;
   --gold: #c49b3f;
   --gold-light: #f2e2c4;
+  --gold-contrast: #a88537;
   --terracotta: #c4785b;
   --terracotta-light: #f0d4c8;
   --sage: #7d9a7a;
   --sage-light: #dae5d8;
   --border: #e5e0d8;
-  --serif: 'Playfair Display', 'Noto Serif SC', Georgia, serif;
-  --sans: 'Inter', 'PingFang SC', system-ui, sans-serif;
-  --mono: 'JetBrains Mono', 'Cascadia Code', monospace;
+  --serif: var(--font-playfair-display), var(--font-noto-serif-sc), Georgia, serif;
+  --sans: var(--font-inter), 'PingFang SC', system-ui, sans-serif;
+  --mono: var(--font-jetbrains-mono), 'Cascadia Code', monospace;
   color-scheme: light;
 }
 
@@ -593,10 +595,10 @@ a { color: inherit; text-decoration: none; }
 .lab-page { padding: 6rem 3rem 8rem; background: var(--bg-warm); }
 .lab-header { margin-bottom: 3rem; }
 .lab-header h2 { font-family: var(--serif); font-size: 3rem; font-weight: 900; letter-spacing: -0.02em; line-height: 1; margin: 0; }
-.lab-header h2 .it { font-style: italic; color: var(--gold); }
+.lab-header h2 .it { font-style: italic; color: var(--gold-contrast); }
 .lab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
 .lab-col h3 { font-family: var(--serif); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
-.lab-hint { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem; }
+.lab-hint { font-size: 0.82rem; color: var(--text-hint); margin-bottom: 1rem; }
 .lab-input-group { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
 .lab-input {
   flex: 1; border: none; border-bottom: 1px solid var(--border);
@@ -620,7 +622,7 @@ a { color: inherit; text-decoration: none; }
 .guest-note:hover { border-color: var(--gold); }
 .guest-note .author { font-size: 0.85rem; font-weight: 600; color: var(--text-soft); }
 .guest-note .msg { font-size: 0.88rem; color: var(--text); margin: 0.2rem 0; }
-.guest-note .time { font-size: 0.72rem; color: var(--text-muted); }
+.guest-note .time { font-size: 0.72rem; color: var(--text-hint); }
 .lab-error { color: var(--terracotta); font-size: 0.82rem; margin-top: 0.5rem; }
 
 /* ═══════════ FOOTER ═══════════ */
@@ -648,6 +650,22 @@ a { color: inherit; text-decoration: none; }
 /* ═══════════ UTILITY ═══════════ */
 .hint { color: var(--text-muted); font-size: 0.8rem; }
 .page-wrap { padding-top: 4.5rem; }
+
+
+/* ═══════════ HERO SCENE PLACEHOLDER ═══════════ */
+/* ═══════════ HERO SCENE PLACEHOLDER ═══════════ */
+.hero-scene-placeholder {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-scene-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
 
 /* ═══════════ RESPONSIVE ═══════════ */
 @media (max-width: 768px) {

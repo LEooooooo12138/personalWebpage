@@ -20,7 +20,7 @@ export async function GET(request: Request) {
       headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" },
     });
   } catch (err) {
-    console.error("Failed to fetch skills:", err);
+    // console.error("Failed to fetch skills:", err);
     return NextResponse.json(
       { error: "Failed to fetch skills data" },
       { status: 500 }

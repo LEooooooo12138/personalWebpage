@@ -4,6 +4,7 @@ import { LanguageProvider } from "@/components/language-provider";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { CursorScript } from "@/components/cursor-script";
+import { ConsoleSuppressor } from "@/components/console-suppressor";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
@@ -12,6 +13,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
   return (
     <LanguageProvider initialLang={initialLang}>
+      <ConsoleSuppressor />
       <div id="cursor" suppressHydrationWarning />
       <div id="cursor-dot" suppressHydrationWarning />
       <section className="aurora" />

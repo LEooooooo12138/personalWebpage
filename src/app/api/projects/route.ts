@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const { getProjectsWithSkills } = await import("@/lib/projects-db");
     return NextResponse.json(getProjectsWithSkills(lang));
   } catch (err) {
-    console.error("Failed to fetch projects:", err);
+    // console.error("Failed to fetch projects:", err);
     return NextResponse.json(
       { error: "Failed to fetch projects data" },
       { status: 500 },

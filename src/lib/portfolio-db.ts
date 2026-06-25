@@ -191,16 +191,16 @@ function migrateProjectTags(db: Database.Database) {
           if (cat) {
             insertStmt.run(proj.id, tag, cat.category_id, idx);
           } else {
-            console.warn(`[migration] Project "${proj.id}" tag "${tag}" not found in skills table — skipping`);
+            // console.warn(`[migration] Project "${proj.id}" tag "${tag}" not found in skills table — skipping`);
           }
         });
       } catch {
-        console.warn(`[migration] Failed to parse tags JSON for project "${proj.id}" — skipping`);
+        // console.warn(`[migration] Failed to parse tags JSON for project "${proj.id}" — skipping`);
       }
     }
   });
   tx();
-  console.log(`[migration] Migrated project tags to project_skills for ${projects.length} projects`);
+  // console.log(`[migration] Migrated project tags to project_skills for ${projects.length} projects`);
 }
 
 function runMigrations(db: Database.Database) {
@@ -248,9 +248,9 @@ function migrateFromSkillsDb(db: Database.Database) {
     });
     tx();
     oldDb.close();
-    console.log("[migration] Migrated skills.db → portfolio.db");
+    // console.log("[migration] Migrated skills.db → portfolio.db");
   } catch (e) {
-    console.warn("[migration] Failed to migrate skills.db:", e);
+    // console.warn("[migration] Failed to migrate skills.db:", e);
   }
 }
 
@@ -269,9 +269,9 @@ function migrateFromGuestbookDb(db: Database.Database) {
     });
     tx();
     oldDb.close();
-    console.log("[migration] Migrated guestbook.db → portfolio.db");
+    // console.log("[migration] Migrated guestbook.db → portfolio.db");
   } catch (e) {
-    console.warn("[migration] Failed to migrate guestbook.db:", e);
+    // console.warn("[migration] Failed to migrate guestbook.db:", e);
   }
 }
 
@@ -290,9 +290,9 @@ function migrateFromVisitsDb(db: Database.Database) {
     });
     tx();
     oldDb.close();
-    console.log("[migration] Migrated visits.db → portfolio.db");
+    // console.log("[migration] Migrated visits.db → portfolio.db");
   } catch (e) {
-    console.warn("[migration] Failed to migrate visits.db:", e);
+    // console.warn("[migration] Failed to migrate visits.db:", e);
   }
 }
 
@@ -352,7 +352,7 @@ function seedStaticData(db: Database.Database) {
   });
   tx();
 
-  console.log("[migration] Seeded static data (profile, experiences, projects, guestbook)");
+  // console.log("[migration] Seeded static data (profile, experiences, projects, guestbook)");
 }
 
 
@@ -424,7 +424,7 @@ function seedSkillRelations(db: Database.Database) {
     }
   });
   tx();
-  console.log("[migration] Seeded skill relations (5 new skills, 6 project links, 14 experience links)");
+  // console.log("[migration] Seeded skill relations (5 new skills, 6 project links, 14 experience links)");
 }
 
 function seedAdminUser(db: Database.Database) {
@@ -433,7 +433,7 @@ function seedAdminUser(db: Database.Database) {
 
   const password = process.env.ADMIN_PASSWORD;
   if (!password) {
-    console.warn("[migration] ADMIN_PASSWORD not set — admin user not created. Set it in .env.local or Vercel env vars.");
+    // console.warn("[migration] ADMIN_PASSWORD not set — admin user not created. Set it in .env.local or Vercel env vars.");
     return;
   }
 
@@ -442,7 +442,7 @@ function seedAdminUser(db: Database.Database) {
   db.prepare("INSERT OR IGNORE INTO admin_users (id, username, password_hash) VALUES (?, ?, ?)").run(
     crypto.randomUUID(), "admin", hash,
   );
-  console.log("[migration] Admin user seeded");
+  // console.log("[migration] Admin user seeded");
 }
 function migrateI18nTables(db: Database.Database) {
   // Ensure i18n tables exist for DBs initialized before these were added to initSchema
@@ -522,6 +522,6 @@ function seedI18nData(db: Database.Database) {
     }
   });
   tx();
-  console.log("[migration] Seeded i18n data (project_i18n, experience_i18n)");
+  // console.log("[migration] Seeded i18n data (project_i18n, experience_i18n)");
 }
 

@@ -27,7 +27,8 @@ export function HomePage({ serverLang }: { serverLang: Language }) {
   }, [lang]);
 
   useEffect(() => {
-    const bootTimer = setTimeout(() => { void fetchStatus(); }, 0);
+    // Defer initial fetch to avoid blocking TBT
+    const bootTimer = setTimeout(() => { void fetchStatus(); }, 300);
     const timer = setInterval(fetchStatus, 20000);
     return () => { clearTimeout(bootTimer); clearInterval(timer); };
   }, [fetchStatus]);
@@ -65,7 +66,9 @@ export function HomePage({ serverLang }: { serverLang: Language }) {
         if (typeof countData.count === "number") setVisitCount(countData.count);
       }
     };
-    void syncVisitCounter();
+    // Defer visit counter sync to avoid blocking TBT
+    const timer = setTimeout(() => { void syncVisitCounter(); }, 300);
+    return () => clearTimeout(timer);
   }, []);
 
   const exploreLinks = [
@@ -79,7 +82,7 @@ export function HomePage({ serverLang }: { serverLang: Language }) {
     <>
       {/* ═══ HERO ═══ */}
       <section className="hero" id="hero">
-        <div className="hero-bg-word" id="hero-bg-word">YAO</div>
+                <div className="hero-bg-word" id="hero-bg-word">YAO</div>
         <div className="hero-content">
           <div className="hero-left">
             <h1>Yuanle<br /><span className="line2">Yao</span></h1>
