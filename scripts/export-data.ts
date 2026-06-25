@@ -10,8 +10,8 @@ const DATA_DIR = path.join(process.cwd(), "src/data");
 const DB_PATH = path.join(process.cwd(), "data", "portfolio.db");
 
 if (!fs.existsSync(DB_PATH)) {
-  console.error("❌ portfolio.db not found at", DB_PATH);
-  process.exit(1);
+  console.warn("⚠️  portfolio.db not found — skipping export (data files already committed)");
+  process.exit(0);
 }
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
