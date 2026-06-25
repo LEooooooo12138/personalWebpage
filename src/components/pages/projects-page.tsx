@@ -79,19 +79,13 @@ export function ProjectsPage({ serverLang }: { serverLang: Language }) {
                       category={skill.category || undefined}
                     />
                   ))}
-                  <span className="hint">{videoHint}</span>
-                  <div className="proj-links">
-                    {project.demoUrl && (
-                      <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="proj-link proj-link-demo">
-                        {m.projects.live}
-                      </a>
-                    )}
-                    {project.repoUrl && (
-                      <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="proj-link proj-link-repo">
-                        {m.projects.repo}
-                      </a>
-                    )}
-                  </div>
+                  {project.repoUrl ? (
+                    <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="hint hint-link">
+                      {videoHint}
+                    </a>
+                  ) : (
+                    <span className="hint">{videoHint}</span>
+                  )}
                 </div>
               </div>
             </div>
