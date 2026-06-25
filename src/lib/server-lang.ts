@@ -1,9 +1,6 @@
-import { cookies } from "next/headers";
 import { Language } from "./i18n";
 
-/** Read the lang cookie on the server. Use in page server components. */
+/** Returns default language. Client-side LanguageProvider handles cookie-based switching. */
 export async function getServerLang(): Promise<Language> {
-  const cookieStore = await cookies();
-  const langCookie = cookieStore.get("lang");
-  return langCookie?.value === "zh" ? "zh" : "en";
+  return "en";
 }

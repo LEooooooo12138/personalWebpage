@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 const notoSerifSC = Noto_Serif_SC({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "900"],
+  weight: ["400", "700", "900"],
   variable: "--font-noto-serif-sc",
   display: "swap",
 });

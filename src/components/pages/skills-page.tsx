@@ -1,5 +1,7 @@
 "use client";
 
+import "@/app/skills.css";
+
 import { useEffect, useState } from "react";
 import { Language, messages } from "@/lib/i18n";
 import { useLanguage } from "@/components/language-provider";

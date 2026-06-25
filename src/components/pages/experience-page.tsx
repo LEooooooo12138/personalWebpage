@@ -1,5 +1,7 @@
 "use client";
 
+import "@/app/experience.css";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Language } from "@/lib/i18n";
 import { useHydratedLanguage } from "@/lib/use-hydrated-language";

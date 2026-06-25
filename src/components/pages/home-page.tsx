@@ -1,5 +1,7 @@
 "use client";
 
+import "@/app/home.css";
+
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { LiveStatus } from "@/types/portfolio";

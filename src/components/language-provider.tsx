@@ -5,6 +5,7 @@ import {
   createContext,
   ReactNode,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -22,6 +23,12 @@ function setLangCookie(lang: Language) {
   document.cookie = `lang=${lang}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
 }
 
+function readLangCookie(): Language {
+  if (typeof document === "undefined") return fallbackLang;
+  const match = document.cookie.match(/(?:^|;\s*)lang=([^;]*)/);
+  return match?.[1] === "zh" ? "zh" : "en";
+}
+
 export function LanguageProvider({
   children,
   initialLang = fallbackLang,
@@ -30,6 +37,16 @@ export function LanguageProvider({
   initialLang?: Language;
 }) {
   const [lang, setLangState] = useState<Language>(initialLang);
+
+  // Sync with cookie on mount — server always sends "en", client corrects
+  useEffect(() => {
+    const cookieLang = readLangCookie();
+    if (cookieLang !== lang) {
+      setLangState(cookieLang);
+    }
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const setLang = (newLang: Language) => {
     setLangState(newLang);

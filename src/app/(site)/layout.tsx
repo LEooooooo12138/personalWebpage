@@ -1,18 +1,12 @@
-import { cookies } from "next/headers";
-import { Language } from "@/lib/i18n";
 import { LanguageProvider } from "@/components/language-provider";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
-import { CursorScript } from "@/components/cursor-script";
+import { CursorLoader } from "@/components/cursor-loader";
 import { ConsoleSuppressor } from "@/components/console-suppressor";
 
-export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = await cookies();
-  const langCookie = cookieStore.get("lang");
-  const initialLang: Language = (langCookie?.value === "zh" ? "zh" : "en");
-
+export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <LanguageProvider initialLang={initialLang}>
+    <LanguageProvider>
       <ConsoleSuppressor />
       <div id="cursor" suppressHydrationWarning />
       <div id="cursor-dot" suppressHydrationWarning />
@@ -20,7 +14,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <SiteNav />
       <main>{children}</main>
       <SiteFooter />
-      <CursorScript />
+      <CursorLoader />
     </LanguageProvider>
   );
 }
