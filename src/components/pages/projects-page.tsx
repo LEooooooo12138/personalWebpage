@@ -80,6 +80,18 @@ export function ProjectsPage({ serverLang }: { serverLang: Language }) {
                     />
                   ))}
                   <span className="hint">{videoHint}</span>
+                  <div className="proj-links">
+                    {project.demoUrl && (
+                      <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="proj-link proj-link-demo">
+                        {m.projects.live}
+                      </a>
+                    )}
+                    {project.repoUrl && (
+                      <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="proj-link proj-link-repo">
+                        {m.projects.repo}
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
